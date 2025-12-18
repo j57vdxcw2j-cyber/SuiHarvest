@@ -1,0 +1,521 @@
+/* ======================
+   PROFILE CONTAINER
+   ====================== */
+.profileContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A1929 0%, #132F4C 100%);
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+
+/* ======================
+   HERO SECTION
+   ====================== */
+.profileHero {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 60px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroTitle {
+  font-size: 48px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-shadow: 0 2px 30px rgba(76, 209, 255, 0.4);
+}
+
+.heroIcon {
+  font-size: 56px;
+  filter: drop-shadow(0 4px 12px rgba(76, 209, 255, 0.5));
+}
+
+.heroSubtitle {
+  font-size: 18px;
+  color: rgba(76, 209, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ======================
+   CONTENT LAYOUT
+   ====================== */
+.profileContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(76, 209, 255, 0.3);
+}
+
+/* ======================
+   USER CARD
+   ====================== */
+.userCard {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.userAvatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #4CD1FF, #4CFFD1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(76, 209, 255, 0.4);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarIcon {
+  font-size: 60px;
+}
+
+.levelBadge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 3px solid #0A1929;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.username {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 12px 0;
+  text-shadow: 0 2px 10px rgba(76, 209, 255, 0.3);
+}
+
+.walletAddress {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: monospace;
+  margin: 0 0 8px 0;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.addressLabel {
+  color: rgba(76, 209, 255, 0.9);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.joinDate {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dateIcon {
+  font-size: 16px;
+}
+
+/* Experience Bar */
+.expSection {
+  margin-top: 20px;
+}
+
+.expHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.expLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.expValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(76, 209, 255, 0.9);
+}
+
+.expBar {
+  width: 100%;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.expFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CD1FF, #4CFFD1);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px rgba(76, 209, 255, 0.6);
+}
+
+/* ======================
+   BALANCE CARD
+   ====================== */
+.balanceCard {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(76, 209, 255, 0.15), rgba(76, 255, 209, 0.15));
+  border: 2px solid rgba(76, 209, 255, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(76, 209, 255, 0.2);
+}
+
+.balanceIcon {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  flex-shrink: 0;
+}
+
+.balanceInfo {
+  flex: 1;
+}
+
+.balanceLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.balanceAmount {
+  font-size: 42px;
+  font-weight: 900;
+  color: #4CD1FF;
+  margin: 0;
+  text-shadow: 0 2px 20px rgba(76, 209, 255, 0.6);
+}
+
+.balanceActions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionBtn:hover {
+  background: rgba(76, 209, 255, 0.2);
+  border-color: rgba(76, 209, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(76, 209, 255, 0.3);
+}
+
+/* ======================
+   TRANSACTION GRID
+   ====================== */
+.transactionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.transactionCard {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.transactionCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(76, 209, 255, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(76, 209, 255, 0.2);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cardIcon {
+  font-size: 32px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.cardValue {
+  font-size: 36px;
+  font-weight: 900;
+  color: #4CD1FF;
+  margin: 0 0 8px 0;
+}
+
+.cardLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardProgress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CD1FF, #4CFFD1);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(76, 209, 255, 0.9);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ======================
+   ACTIVITY LIST
+   ====================== */
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.activityItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(76, 209, 255, 0.3);
+}
+
+.activityIcon {
+  width: 48px;
+  height: 48px;
+  background: rgba(76, 209, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.activityDetails {
+  flex: 1;
+}
+
+.activityTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 4px 0;
+}
+
+.activityTime {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.activityAmount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4CD1FF;
+}
+
+/* ======================
+   RESPONSIVE DESIGN
+   ====================== */
+@media (max-width: 1024px) {
+  .transactionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileContainer {
+    padding-top: 80px;
+  }
+
+  .profileHero {
+    padding: 40px 20px;
+  }
+
+  .heroTitle {
+    font-size: 36px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .heroIcon {
+    font-size: 40px;
+  }
+
+  .section {
+    padding: 24px;
+  }
+
+  .userCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .username {
+    font-size: 24px;
+  }
+
+  .balanceCard {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .balanceAmount {
+    font-size: 32px;
+  }
+
+  .balanceActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .actionBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cardValue {
+    font-size: 28px;
+  }
+}
+/* ======================
+   EMPTY STATE
+   ====================== */
+.emptyState {
+  padding: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+}
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 28px;
+  }
+
+  .username {
+    font-size: 20px;
+  }
+
+  .balanceAmount {
+    font-size: 28px;
+  }
+
+  .cardValue {
+    font-size: 24px;
+  }
+
+  .activityItem {
+    flex-direction: column;
+    text-align: center;
+  }
+}

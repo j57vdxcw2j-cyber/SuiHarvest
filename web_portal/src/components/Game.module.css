@@ -1,0 +1,402 @@
+.gameContainer {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  padding-top: 100px;
+  background: linear-gradient(135deg, #0a192f 0%, #1a2942 100%);
+}
+
+.noWallet, .loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: white;
+  text-align: center;
+}
+
+.noWallet h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.noWallet p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Layout */
+.gameLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr 300px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Panel Styles */
+.leftPanel, .centerPanel, .rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Card Base Styles */
+.statsCard, .contractCard, .staminaCard, .startDayCard, 
+.inventoryCard, .logCard, .actionCard, .endDayCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.statsCard h3, .contractCard h3, .staminaCard h3, 
+.inventoryCard h3, .logCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Stats Card */
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.statRow:last-child {
+  border-bottom: none;
+}
+
+.statRow strong {
+  color: white;
+  font-weight: 600;
+}
+
+.claimButton {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: none;
+  border-radius: 8px;
+  color: #1a2942;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.claimButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Contract Card */
+.contractDifficulty {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.contractDesc {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.contractSection {
+  margin-top: 16px;
+}
+
+.contractSection h4 {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.requirement {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.inventoryCheck {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.contractActions {
+  margin-top: 16px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Stamina Card */
+.staminaBar {
+  width: 100%;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.staminaFill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.staminaText {
+  text-align: center;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Start Day Card */
+.startDayCard {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.startDayCard h2 {
+  color: white;
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.startDayCard p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.startButton {
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.startButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+}
+
+/* Actions Grid */
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.actionCard {
+  text-align: center;
+  padding: 16px;
+}
+
+.actionCard h4 {
+  color: white;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.actionCard p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.actionCard button {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.actionCard button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.actionCard button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cropButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* End Day Card */
+.endDayCard {
+  text-align: center;
+  padding: 16px;
+}
+
+.endButton {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.endButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Inventory Card */
+.inventoryGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.inventoryItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.inventoryItem strong {
+  color: white;
+  font-weight: 700;
+}
+
+/* Log Card */
+.logContent {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.logEntry {
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.logContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.logContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.logContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.logContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .gameLayout {
+    grid-template-columns: 1fr;
+  }
+  
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .gameContainer {
+    padding: 10px;
+    padding-top: 80px;
+  }
+  
+  .statsCard, .contractCard, .staminaCard, .startDayCard,
+  .inventoryCard, .logCard, .actionCard, .endDayCard {
+    padding: 16px;
+  }
+  
+  .gameLayout {
+    gap: 10px;
+  }
+}
