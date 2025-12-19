@@ -6,6 +6,7 @@ import { resourceService } from '../services/resourceService';
 import { inventoryService } from '../services/inventoryService';
 import { famePointService } from '../services/famePointService';
 import { payDailyEntryFee, claimTreasureReward } from '../services/suiBlockchainService';
+import { transactionService } from '../services/transactionService';
 import { CaseOpening } from './CaseOpening';
 import type { GameSession, Inventory, GameState, Contract, CaseRarity } from '../types';
 import { GAME_CONSTANTS } from '../config/gameConstants';
@@ -22,6 +23,37 @@ export function Game() {
   const [isOpeningCase, setIsOpeningCase] = useState(false);
   const [isProcessingBlockchain, setIsProcessingBlockchain] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [showOpenCaseConfirm, setShowOpenCaseConfirm] = useState(false);
+  const [caseResetCountdown, setCaseResetCountdown] = useState<string>('');
+
+  // Calculate time until case limit resets
+  useEffect(() => {
+    if (!gameStats?.lastCaseResetTime || !gameStats?.casesOpenedToday || gameStats.casesOpenedToday < 3) {
+      setCaseResetCountdown('');
+      return;
+    }
+
+    const updateCountdown = () => {
+      const resetTime = new Date(gameStats.lastCaseResetTime!);
+      const resetEnd = new Date(resetTime.getTime() + 24 * 60 * 60 * 1000);
+      const now = new Date();
+      const diff = resetEnd.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setCaseResetCountdown('Sẵn sàng!');
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setCaseResetCountdown(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [gameStats?.lastCaseResetTime, gameStats?.casesOpenedToday]);
 
   // Load current session and game stats
   useEffect(() => {
@@ -81,10 +113,12 @@ export function Game() {
           setGameStats(statsResponse.data!);
         }
 
-        // Auto-open case selection for first case
-        setTimeout(() => {
-          setShowCaseOpening(true);
-        }, 500);
+        // Auto-open case selection ONLY if no contract (first time or after submit)
+        if (!response.data.contract) {
+          setTimeout(() => {
+            setShowCaseOpening(true);
+          }, 500);
+        }
       } else {
         addLog(`❌ ${response.error || 'Failed to start day'}`);
       }
@@ -108,7 +142,23 @@ export function Game() {
       return;
     }
 
+    // Show confirmation popup if not using free spin
+    if (!activeSession.hasFreeSpinAvailable) {
+      setShowOpenCaseConfirm(true);
+    } else {
+      addLog('🎁 Sử dụng lượt quay miễn phí!');
+      setShowCaseOpening(true);
+    }
+  };
+
+  const handleConfirmOpenCase = () => {
+    setShowOpenCaseConfirm(false);
     setShowCaseOpening(true);
+  };
+
+  const handleCancelOpenCase = () => {
+    setShowOpenCaseConfirm(false);
+    addLog('❌ Đã hủy mở rương');
   };
 
   const handleCaseComplete = async (contract: Contract, rarity: CaseRarity, grantedFreeSpin: boolean) => {
@@ -134,6 +184,14 @@ export function Game() {
         }
         
         addLog(`✅ Payment successful! TX: ${txResult.digest?.slice(0, 12)}...`);
+        
+        // Log transaction to Firebase
+        await transactionService.logOpenCase(
+          walletAddress,
+          0.75,
+          rarity,
+          txResult.digest
+        );
       } else {
         addLog('🎁 Using free spin!');
       }
@@ -301,7 +359,7 @@ export function Game() {
       return;
     }
 
-    if (!window.confirm('🌙 End day? All remaining items will be burned!')) {
+    if (!window.confirm('🌙 Kết thúc ngày? Một số items sẽ bị mất ngẫu nhiên (30-50% mỗi loại)!')) {
       return;
     }
 
@@ -354,6 +412,13 @@ export function Game() {
         addLog(`✅ Successfully claimed ${gameStats.totalSuiEarned.toFixed(2)} SUI!`);
         addLog(`📝 Transaction: ${claimResult.digest}`);
         
+        // Log transaction to Firebase
+        await transactionService.logClaimReward(
+          walletAddress,
+          gameStats.totalSuiEarned,
+          claimResult.digest
+        );
+        
         // Update Firebase to reset totalSuiEarned (already claimed)
         await gameStateService.resetClaimedSui(walletAddress);
         
@@ -374,51 +439,7 @@ export function Game() {
   };
 
   const handleClaimChest = async () => {
-    if (!walletAddress) {
-      addLog('❌ Please connect wallet');
-      return;
-    }
-
-    try {
-      setIsProcessingBlockchain(true);
-      
-      // Step 1: Roll reward in Firestore
-      addLog('🎁 Opening treasure chest...');
-      const response = await famePointService.claimTreasureChest(walletAddress);
-      
-      if (!response.success || !response.data) {
-        addLog(`❌ ${response.error}`);
-        setIsProcessingBlockchain(false);
-        return;
-      }
-      
-      const rewardSui = response.data.suiReward;
-      addLog(`🎉 Rolled ${rewardSui} SUI reward!`);
-      
-      // Step 2: Execute blockchain transaction to send SUI
-      addLog(`💳 Sending ${rewardSui} SUI to your wallet...`);
-      const txResult = await claimTreasureReward(signAndExecuteTransaction, rewardSui);
-      
-      if (!txResult.success) {
-        addLog(`❌ Transaction failed: ${txResult.error}`);
-        setIsProcessingBlockchain(false);
-        return;
-      }
-      
-      addLog(`✅ ${rewardSui} SUI claimed! TX: ${txResult.digest?.slice(0, 12)}...`);
-      
-      // Refresh stats
-      const statsResponse = await gameStateService.getGameStats(walletAddress);
-      if (statsResponse.success) {
-        setGameStats(statsResponse.data!);
-      }
-      
-      setIsProcessingBlockchain(false);
-    } catch (error: any) {
-      console.error('Error claiming chest:', error);
-      addLog(`❌ Error: ${error.message}`);
-      setIsProcessingBlockchain(false);
-    }
+    addLog('📢 Coming soon in next version');
   };
 
   // Helper functions for display
@@ -441,8 +462,9 @@ export function Game() {
   };
 
   const canClaimChest = gameStats && gameStats.famePoints >= GAME_CONSTANTS.FAME_POINTS_FOR_CHEST;
+  const caseLimitReached = gameStats && gameStats.casesOpenedToday >= GAME_CONSTANTS.MAX_CASES_PER_DAY;
   const canOpenAnotherCase = activeSession && 
-    (activeSession.casesOpened || 0) < GAME_CONSTANTS.MAX_CASES_PER_DAY &&
+    !caseLimitReached &&
     (activeSession.contractSubmitted || activeSession.hasFreeSpinAvailable);
 
   if (!walletAddress) {
@@ -536,7 +558,7 @@ export function Game() {
                   color: getContractDifficultyColor(activeSession.contract.difficulty),
                   margin: 0 
                 }}>
-                  📜 Contract {activeSession.casesOpened || 1}/3
+                  📜 Contract {gameStats?.casesOpenedToday || 1}/3
                 </h3>
                 {activeSession.currentCaseRarity && (
                   <span style={{
@@ -583,27 +605,35 @@ export function Game() {
                   {activeSession.contractSubmitted ? '✅ Submitted' : '📦 Submit Contract'}
                 </button>
 
-                {canOpenAnotherCase && (
+                {(canOpenAnotherCase || caseLimitReached) && (
                   <button
                     className={styles.openCaseButton}
                     onClick={handleOpenCase}
-                    disabled={isOpeningCase}
+                    disabled={isOpeningCase || !!caseLimitReached}
                     style={{
                       marginTop: '12px',
                       width: '100%',
                       padding: '12px',
-                      background: activeSession.hasFreeSpinAvailable 
+                      background: caseLimitReached 
+                        ? '#4B5563'
+                        : activeSession.hasFreeSpinAvailable 
                         ? 'linear-gradient(135deg, #A855F7 0%, #7c3aed 100%)'
                         : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                       border: 'none',
                       borderRadius: '8px',
                       color: 'white',
                       fontWeight: '700',
-                      cursor: 'pointer'
+                      cursor: caseLimitReached ? 'not-allowed' : 'pointer',
+                      opacity: caseLimitReached ? 0.6 : 1
                     }}
                   >
-                    {activeSession.hasFreeSpinAvailable ? '🎁 FREE CASE' : '📦 Open Next Case'}
-                    {' '}({(activeSession.casesOpened || 0) + 1}/3)
+                    {caseLimitReached 
+                      ? `⏰ Reset in ${caseResetCountdown}`
+                      : activeSession.hasFreeSpinAvailable 
+                        ? '🎁 FREE CASE' 
+                        : '📦 Open Next Case'
+                    }
+                    {!caseLimitReached && ` (${gameStats?.casesOpenedToday || 0}/3)`}
                   </button>
                 )}
               </div>
@@ -614,9 +644,11 @@ export function Game() {
             <div className={styles.contractCard}>
               <h3>📦 Case Opening</h3>
               <p className={styles.contractDesc}>
-                {activeSession.casesOpened === 0 
-                  ? 'Open your first case to get today\'s contract!'
-                  : `Case ${(activeSession.casesOpened || 0) + 1}/3`
+                {caseLimitReached
+                  ? 'Đã đạt giới hạn 3 case/24h'
+                  : gameStats && gameStats.casesOpenedToday === 0 
+                    ? 'Open your first case to get today\'s contract!'
+                    : `Case ${(gameStats?.casesOpenedToday || 0) + 1}/3`
                 }
               </p>
               <div style={{ 
@@ -624,25 +656,28 @@ export function Game() {
                 padding: '40px 20px',
                 fontSize: '80px'
               }}>
-                📦
+                {caseLimitReached ? '⏰' : '📦'}
               </div>
               <button
                 className={styles.openButton}
                 onClick={handleOpenCase}
-                disabled={isOpeningCase}
+                disabled={isOpeningCase || !!caseLimitReached}
                 style={{
                   width: '100%',
                   padding: '16px',
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  background: caseLimitReached 
+                    ? '#4B5563'
+                    : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                   border: 'none',
                   borderRadius: '12px',
                   color: 'white',
                   fontWeight: '700',
                   fontSize: '18px',
-                  cursor: 'pointer'
+                  cursor: caseLimitReached ? 'not-allowed' : 'pointer',
+                  opacity: caseLimitReached ? 0.6 : 1
                 }}
               >
-                🎲 Open Case
+                {caseLimitReached ? `⏰ Reset in ${caseResetCountdown}` : '🎲 Open Case'}
               </button>
             </div>
           )}
@@ -667,14 +702,14 @@ export function Game() {
 
           {!activeSession && gameStats?.canStartNewDay && (
             <div className={styles.startDayCard}>
-              <h2>🌅 Ready to Start?</h2>
-              <p>Entry Fee: 0.75 SUI</p>
+              <h2>🌅 Bắt đầu ngày mới</h2>
+              <p style={{ color: '#10b981', fontWeight: 600 }}>✨ Miễn phí - Hồi đầy stamina</p>
               <button 
                 className={styles.startButton} 
                 onClick={handleStartDay}
                 disabled={isProcessingBlockchain}
               >
-                {isProcessingBlockchain ? '⏳ Processing...' : 'Start New Day'}
+                {isProcessingBlockchain ? '⏳ Đang xử lý...' : 'Bắt đầu ngày mới'}
               </button>
             </div>
           )}
@@ -763,6 +798,144 @@ export function Game() {
           onComplete={handleCaseComplete}
           onCancel={() => setShowCaseOpening(false)}
         />
+      )}
+
+      {/* Open Case Confirmation Popup */}
+      {showOpenCaseConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '24px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: '800',
+              marginBottom: '16px',
+              textAlign: 'center',
+              background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 2px 10px rgba(255, 215, 0, 0.3)'
+            }}>
+              💰 Mở Rương Nhiệm Vụ
+            </h2>
+            
+            <div style={{
+              background: 'rgba(255, 107, 107, 0.1)',
+              border: '1px solid rgba(255, 107, 107, 0.3)',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              <p style={{ fontSize: '20px', fontWeight: '700', color: '#FF6B6B', margin: 0 }}>
+                Chi phí: 0.75 SUI
+              </p>
+            </div>
+
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#fff' }}>
+                📦 Tỷ lệ nhận thưởng:
+              </p>
+              
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', color: '#B0B0B0' }}>📦 Common (75%)</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#FF6B6B' }}>0.30-0.50 SUI (lỗ)</span>
+              </div>
+              
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', color: '#7DD3FC' }}>💎 Advanced (22%)</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFA500' }}>0.60-0.70 SUI (hòa)</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', color: '#FFD700' }}>🌟 Epic (3%)</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#4ADE80' }}>1.50-2.50 SUI (lời!) + Free</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={handleCancelOpenCase}
+                style={{
+                  flex: 1,
+                  padding: '14px 24px',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  borderRadius: '12px',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                ❌ Hủy
+              </button>
+              
+              <button
+                onClick={handleConfirmOpenCase}
+                style={{
+                  flex: 1,
+                  padding: '14px 24px',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.4)';
+                }}
+              >
+                ✅ Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -79,12 +79,41 @@ class InventoryService {
   }
 
   /**
-   * Burn inventory (end of day - Roguelike mechanic)
+   * Burn inventory (submit contract - Roguelike mechanic)
    * All items are destroyed, returns empty inventory
    */
   burnInventory(): Inventory {
     console.log('🔥 Burning all remaining items...');
     return this.createEmptyInventory();
+  }
+
+  /**
+   * Burn random items when ending day without submitting contract
+   * Burns 30-50% of each item type randomly
+   */
+  burnRandomItems(inventory: Inventory): Inventory {
+    const newInventory = { ...inventory };
+    let totalBurned = 0;
+    
+    // For each item type, burn 30-50% randomly
+    Object.keys(newInventory).forEach(key => {
+      const itemCount = newInventory[key as keyof Inventory];
+      if (itemCount > 0) {
+        // Random percentage between 30% and 50%
+        const burnPercentage = 0.3 + Math.random() * 0.2;
+        const burnCount = Math.floor(itemCount * burnPercentage);
+        
+        newInventory[key as keyof Inventory] = itemCount - burnCount;
+        totalBurned += burnCount;
+        
+        if (burnCount > 0) {
+          console.log(`🔥 Burned ${burnCount}/${itemCount} ${key}`);
+        }
+      }
+    });
+    
+    console.log(`⚠️ Total burned: ${totalBurned} items (random 30-50% of each type)`);
+    return newInventory;
   }
 
   /**

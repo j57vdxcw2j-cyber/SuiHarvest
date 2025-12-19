@@ -24,8 +24,14 @@ export function Contact() {
       <div className="container">
         <div className={styles.contactGrid}>
           <div>
-            <h1>Contact Us</h1>
-            <p>Have questions? We'd love to hear from you.</p>
+
+            <h1>
+              <span role="img" aria-label="Contact" style={{ fontSize: 40, filter: 'drop-shadow(0 4px 12px rgba(59,130,246,0.5))', marginRight: 8 }}>✉️</span>
+              Contact Us
+            </h1>
+            <p style={{ fontStyle: 'italic', fontWeight: 300 }}>
+              Have questions? We'd love to hear from you.
+            </p>
 
             <div className={styles.contactItem}>
               <strong>📍 HQ:</strong> Van Lang University, HCMC
@@ -73,7 +79,7 @@ export function Contact() {
                   rows={5}
                 />
               </div>
-              <button type="submit" className="btn btn-orange" style={{ width: '100%' }}>
+              <button type="submit" className={styles.contactFormButton}>
                 {submitted ? '✓ Message Sent!' : 'Send Message'}
               </button>
             </form>

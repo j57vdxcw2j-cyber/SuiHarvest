@@ -1,3 +1,4 @@
+import type { Contract } from '../types';
 import { db } from '../config/firebase';
 import { collection, doc, getDoc, updateDoc, addDoc, setDoc } from 'firebase/firestore';
 import type { GameSession, GameAction, GameState, Inventory, ApiResponse } from '../types';
@@ -37,7 +38,7 @@ class GameStateService {
       advancedCasesOpened: 0,
       epicCasesOpened: 0,
       totalFreeSpinsReceived: 0,
-      lastCaseOpenDate: undefined,
+      lastCaseResetTime: undefined,
       casesOpenedToday: 0,
       canStartNewDay: true
     };
@@ -88,16 +89,38 @@ class GameStateService {
       const now = new Date().toISOString();
       const newDay = gameState.currentDay + 1;
       
-      // Create game session WITHOUT contract (will be assigned when opening case)
+      // Preserve contract and inventory from previous session
+      let previousContract: Contract | null = null;
+      let previousInventory: Inventory = { ...EMPTY_INVENTORY };
+      
+      if (gameState.lastSessionId) {
+        const prevSessionRef = doc(this.gameSessionsCollection, gameState.lastSessionId);
+        const prevSessionDoc = await getDoc(prevSessionRef);
+        if (prevSessionDoc.exists()) {
+          const prevSession = prevSessionDoc.data() as GameSession;
+          
+          // Only keep contract if it wasn't submitted yet
+          if (prevSession.contract && !prevSession.contractSubmitted) {
+            previousContract = prevSession.contract;
+          }
+          
+          // Always preserve inventory from previous day (already burned in endDay)
+          if (prevSession.inventory) {
+            previousInventory = prevSession.inventory;
+          }
+        }
+      }
+      
+      // Create game session - preserve contract & inventory to continue mission
       const session: Omit<GameSession, 'id'> = {
         userId: walletAddress,
         walletAddress,
         day: newDay,
         startedAt: now,
-        contract: null as any, // Will be set by openCaseForSession
+        contract: previousContract as any, // Preserved from prev day or null (set by openCaseForSession)
         currentStamina: GAME_CONSTANTS.MAX_STAMINA,
         maxStamina: GAME_CONSTANTS.MAX_STAMINA,
-        inventory: { ...EMPTY_INVENTORY },
+        inventory: previousInventory, // Carry over items from previous day (after 30-50% burn)
         actions: [],
         completed: false,
         contractSubmitted: false,
@@ -125,10 +148,14 @@ class GameStateService {
         ...session
       };
       
+      const message = previousContract 
+        ? `☀️ Ngày ${newDay} bắt đầu! Tiếp tục nhiệm vụ của bạn`
+        : `Ngày ${newDay} bắt đầu! Hãy mở Case để nhận nhiệm vụ`;
+      
       return {
         success: true,
         data: createdSession,
-        message: `Ngày ${newDay} bắt đầu! Hãy mở Case để nhận nhiệm vụ`
+        message
       };
     } catch (error: any) {
       console.error('Error starting new day:', error);
@@ -172,10 +199,13 @@ class GameStateService {
       const sessionData = sessionDoc.data() as GameSession;
       const gameState = userData.gameState || this.createInitialGameState();
       
-      // Check if today's date changed (reset daily limit)
-      const today = new Date().toISOString().split('T')[0];
-      const lastCaseDate = gameState.lastCaseOpenDate?.split('T')[0];
-      const casesOpenedToday = today === lastCaseDate ? (gameState.casesOpenedToday || 0) : 0;
+      // Check if 24 hours passed since last reset (real-time, not game day)
+      const now = new Date();
+      const lastResetTime = gameState.lastCaseResetTime ? new Date(gameState.lastCaseResetTime) : null;
+      const hoursSinceReset = lastResetTime ? (now.getTime() - lastResetTime.getTime()) / (1000 * 60 * 60) : 999;
+      
+      // Reset if 24+ hours passed or first time
+      const casesOpenedToday = hoursSinceReset >= 24 ? 0 : (gameState.casesOpenedToday || 0);
       
       // Validate can open case
       const canOpenResult = caseService.canOpenCase(
@@ -209,9 +239,13 @@ class GameStateService {
       const updates: any = {
         'gameState.totalCasesOpened': (gameState.totalCasesOpened || 0) + 1,
         'gameState.casesOpenedToday': casesOpenedToday + 1,
-        'gameState.lastCaseOpenDate': new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+      
+      // Set reset time if this is first case in new 24h cycle
+      if (casesOpenedToday === 0) {
+        updates['gameState.lastCaseResetTime'] = now.toISOString();
+      }
       
       // Increment rarity-specific counter
       if (rarity === 'common') {
@@ -400,10 +434,13 @@ class GameStateService {
       const sessionData = sessionDoc.data() as GameSession;
       const gameState = userData.gameState || this.createInitialGameState();
       
-      // Check if today's date changed (reset daily limit)
-      const today = new Date().toISOString().split('T')[0];
-      const lastCaseDate = gameState.lastCaseOpenDate?.split('T')[0];
-      const casesOpenedToday = today === lastCaseDate ? (gameState.casesOpenedToday || 0) : 0;
+      // Check if 24 hours passed since last reset (real-time, not game day)
+      const now = new Date();
+      const lastResetTime = gameState.lastCaseResetTime ? new Date(gameState.lastCaseResetTime) : null;
+      const hoursSinceReset = lastResetTime ? (now.getTime() - lastResetTime.getTime()) / (1000 * 60 * 60) : 999;
+      
+      // Reset if 24+ hours passed or first time
+      const casesOpenedToday = hoursSinceReset >= 24 ? 0 : (gameState.casesOpenedToday || 0);
       
       // Update session with new contract
       await updateDoc(sessionRef, {
@@ -418,9 +455,13 @@ class GameStateService {
       const updates: any = {
         'gameState.totalCasesOpened': (gameState.totalCasesOpened || 0) + 1,
         'gameState.casesOpenedToday': casesOpenedToday + 1,
-        'gameState.lastCaseOpenDate': new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+      
+      // Set reset time if this is first case in new 24h cycle
+      if (casesOpenedToday === 0) {
+        updates['gameState.lastCaseResetTime'] = now.toISOString();
+      }
       
       // Increment rarity-specific counter
       if (rarity === 'common') {
@@ -518,10 +559,13 @@ class GameStateService {
         };
       }
       
+      // Burn ALL remaining items after submitting contract (Roguelike mechanic)
+      const emptyInventory = inventoryService.burnInventory();
+      
       // Update session
       await updateDoc(sessionRef, {
         contractSubmitted: true,
-        inventory: removeResult.data
+        inventory: emptyInventory
       });
       
       // Add fame points
@@ -597,14 +641,14 @@ class GameStateService {
       const session = sessionDoc.data() as GameSession;
       const now = new Date().toISOString();
       
-      // Burn inventory
-      const emptyInventory = inventoryService.burnInventory();
+      // Burn random items (30-50% of each type)
+      const remainingInventory = inventoryService.burnRandomItems(session.inventory);
       
       // Update session
       await updateDoc(sessionRef, {
         completed: true,
         endedAt: now,
-        inventory: emptyInventory
+        inventory: remainingInventory
       });
       
       // Update user
@@ -621,7 +665,7 @@ class GameStateService {
       
       return {
         success: true,
-        message: '🌙 Ngày kết thúc. Inventory đã bị xóa. Hẹn gặp lại ngày mai!'
+        message: '🌙 Ngày kết thúc. Một số items bị mất (30-50% mỗi loại). Hẹn gặp lại ngày mai!'
       };
     } catch (error: any) {
       console.error('Error ending day:', error);

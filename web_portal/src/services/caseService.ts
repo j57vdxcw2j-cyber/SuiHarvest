@@ -166,6 +166,18 @@ class CaseService {
     reason?: string;
     requiresPayment: boolean;
   }> {
+    // Check daily limit first (3 cases max per 24h real-time) - applies to ALL cases including free spins
+    if (casesOpenedToday >= GAME_CONSTANTS.MAX_CASES_PER_DAY) {
+      return {
+        success: false,
+        data: {
+          canOpen: false,
+          reason: 'Đã đạt giới hạn 3 case/24h (thời gian thực)',
+          requiresPayment: false
+        }
+      };
+    }
+    
     // First case of the day - always available
     if (casesOpenedToday === 0) {
       return {
@@ -177,7 +189,7 @@ class CaseService {
       };
     }
     
-    // Free spin available - no restrictions
+    // Free spin available - no payment required but still counts toward 3/day limit
     if (hasFreeSpinAvailable) {
       return {
         success: true,
@@ -195,18 +207,6 @@ class CaseService {
         data: {
           canOpen: false,
           reason: 'Phải hoàn thành nhiệm vụ hiện tại trước',
-          requiresPayment: false
-        }
-      };
-    }
-    
-    // Check daily limit (3 cases max)
-    if (casesOpenedToday >= GAME_CONSTANTS.MAX_CASES_PER_DAY) {
-      return {
-        success: false,
-        data: {
-          canOpen: false,
-          reason: 'Đã đạt giới hạn 3 case/ngày',
           requiresPayment: false
         }
       };

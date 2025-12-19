@@ -107,23 +107,15 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     <div className={styles.container}>
       <div className={styles.loginCard}>
         <div className={styles.logo}>
-          <div className={styles.logoIcon}>🌾</div>
           <h1>SuiHarvest Admin</h1>
         </div>
 
         <form onSubmit={handleLogin} className={styles.form}>
           <h2>Admin Login</h2>
           <p className={styles.subtitle}>Sign in to access the admin dashboard</p>
-          <div style={{background: 'green', color: 'white', padding: '8px', fontSize: '12px', marginBottom: '10px'}}>
-            ✅ NEW VERSION - Firebase Integration Active
-          </div>
-
           {error && (
-            <div className={styles.error}>
-              ⚠️ {error}
-            </div>
+            <div className={styles.error}>{error}</div>
           )}
-
           <div className={styles.inputGroup}>
             <label htmlFor="username">Username</label>
             <input
@@ -136,7 +128,6 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               autoComplete="username"
             />
           </div>
-
           <div className={styles.inputGroup}>
             <label htmlFor="password">Password</label>
             <input
@@ -149,32 +140,21 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               autoComplete="current-password"
             />
           </div>
-
           <button
             type="submit"
             className={styles.loginButton}
             disabled={isLoading}
           >
-            {isLoading ? '⏳ Signing in...' : '🔐 Sign In'}
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
-
           <button
             type="button"
             className={styles.backButton}
             onClick={handleBackToHome}
           >
-            ← Back to Home
+            Back to Home
           </button>
         </form>
-
-        <div className={styles.footer}>
-          <p className={styles.hint}>
-            💡 <strong>Login Info:</strong><br />
-            • Use admin account from Account Management<br />
-            • Default: admin / suiharvest2025 (legacy)<br />
-            • Wallet connection required in Sui Management only
-          </p>
-        </div>
       </div>
     </div>
   );

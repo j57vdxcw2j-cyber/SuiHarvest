@@ -86,7 +86,7 @@ export function CaseOpening({ onComplete, onCancel }: CaseOpeningProps) {
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>
-          <h2>🎁 Case Opening</h2>
+          <h2>ase Opening</h2>
           {onCancel && !isAnimating && !revealed && (
             <button onClick={onCancel} className={styles.closeButton}>×</button>
           )}
@@ -101,7 +101,7 @@ export function CaseOpening({ onComplete, onCancel }: CaseOpeningProps) {
               <p>Click to reveal your contract</p>
             </div>
             <button onClick={openCase} className={styles.openButton}>
-              🎲 Open Case
+              Open Case
             </button>
           </div>
         )}
@@ -131,7 +131,6 @@ export function CaseOpening({ onComplete, onCancel }: CaseOpeningProps) {
                       >
                         {rarity.toUpperCase()}
                       </div>
-                      <div className={styles.contractIcon}>📜</div>
                       <div className={styles.contractTitle}>
                         {contract.description.length > 30 
                           ? contract.description.substring(0, 30) + '...'
@@ -139,7 +138,7 @@ export function CaseOpening({ onComplete, onCancel }: CaseOpeningProps) {
                         }
                       </div>
                       <div className={styles.rewards}>
-                        💰 {contract.rewards.sui} SUI
+                        SUI
                       </div>
                     </div>
                   );
@@ -187,10 +186,10 @@ export function CaseOpening({ onComplete, onCancel }: CaseOpeningProps) {
                 <div className={styles.rewardsList}>
                   <h4>Rewards:</h4>
                   <div className={styles.rewardItem}>
-                    💰 <strong>{finalContract.rewards.sui} SUI</strong>
+                     <strong>{finalContract.rewards.sui} SUI</strong>
                   </div>
                   <div className={styles.rewardItem}>
-                    ⭐ <strong>{finalContract.rewards.famePoints} Fame Points</strong>
+                    <strong>{finalContract.rewards.famePoints} Fame Points</strong>
                   </div>
                 </div>
 

@@ -322,9 +322,11 @@ export function AccountManagement() {
                       <div className={styles.transactionTime}>{tx.time}</div>
                     </div>
                     <div className={styles.transactionStatus}>
-                      <span className={tx.status === 'success' ? styles.statusSuccess : styles.statusFailed}>
-                        {tx.status === 'success' ? '✓' : '✗'}
-                      </span>
+                      {tx.status === 'success' && (
+                        <span className={styles.statusSuccess}>
+                          Success
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -344,11 +346,10 @@ export function AccountManagement() {
         {/* User Activity Chart Placeholder */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2>📈 User Activity Trends</h2>
+            <h2>User Activity Trends</h2>
           </div>
           <div className={styles.cardContent}>
             <div className={styles.chartPlaceholder}>
-              <div className={styles.chartIcon}>📊</div>
               <p>Activity chart coming soon</p>
               <span className={styles.chartNote}>Will show daily/weekly user engagement</span>
             </div>
@@ -358,25 +359,22 @@ export function AccountManagement() {
         {/* Quick Actions */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2>⚡ Quick Actions</h2>
+            <h2>Quick Actions</h2>
           </div>
           <div className={styles.cardContent}>
             <button className={styles.actionButton}>
-              <span>🔍</span>
               <div>
                 <strong>Search User</strong>
                 <p>Find by wallet address</p>
               </div>
             </button>
             <button className={styles.actionButton}>
-              <span>📥</span>
               <div>
                 <strong>Export Data</strong>
                 <p>Download user/transaction CSV</p>
               </div>
             </button>
             <button className={styles.actionButton}>
-              <span>📧</span>
               <div>
                 <strong>Send Notification</strong>
                 <p>Broadcast to all users</p>

@@ -222,7 +222,7 @@ export function SuiManagement() {
     }
 
     // Check if treasury has enough balance
-    if (amount > treasuryBalance) {
+    if (Number(amount) > Number(treasuryBalance)) {
       showMessage(`❌ Insufficient treasury balance. Available: ${treasuryBalance} SUI`, 'error');
       return;
     }
@@ -232,18 +232,18 @@ export function SuiManagement() {
       `⚠️ Withdraw Confirmation\n\n` +
       `You are about to withdraw ${amount} SUI from the treasury to your wallet.\n\n` +
       `Current Treasury Balance: ${treasuryBalance} SUI\n` +
-      `Remaining after withdrawal: ${(treasuryBalance - amount).toFixed(2)} SUI\n\n` +
+      `Remaining after withdrawal: ${(Number(treasuryBalance) - Number(amount)).toFixed(2)} SUI\n\n` +
       `Do you want to proceed with this withdrawal?`
     );
 
     if (!confirmWithdraw) {
-      showMessage('Withdrawal cancelled', 'info');
+      showMessage('Withdrawal cancelled'); 
       return;
     }
 
     try {
       setIsProcessing(true);
-      showMessage('🔄 Processing withdrawal...', 'info');
+      showMessage('🔄 Processing withdrawal...');
 
       console.log('Withdrawing from treasury:', { amount });
       const result = await adminWithdrawFromTreasury(signAndExecuteTransaction, amount);
@@ -328,38 +328,18 @@ export function SuiManagement() {
         </div>
         <div className={styles.headerRight}>
           {currentAccount ? (
-            <div className={styles.walletInfo}>
-              <div>
+            <div className={styles.walletInfoCard}>
+              <div className={styles.walletDetails}>
                 <div className={styles.walletLabel}>Connected Wallet</div>
                 <div className={styles.walletAddress}>
                   {currentAccount.address.slice(0, 8)}...{currentAccount.address.slice(-6)}
                 </div>
               </div>
               <button
+                className={styles.disconnectButton}
                 onClick={handleDisconnectWallet}
-                style={{
-                  marginLeft: '12px',
-                  padding: '8px 16px',
-                  background: 'rgba(220, 53, 69, 0.1)',
-                  border: '1px solid rgba(220, 53, 69, 0.3)',
-                  borderRadius: '8px',
-                  color: '#ff6b6b',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  backdropFilter: 'blur(10px)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(220, 53, 69, 0.2)';
-                  e.currentTarget.style.borderColor = 'rgba(220, 53, 69, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(220, 53, 69, 0.3)';
-                }}
               >
-                🔌 Disconnect
+                Disconnect
               </button>
             </div>
           ) : (

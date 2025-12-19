@@ -127,7 +127,7 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
               setError('');
             }}
           >
-            🔗 Connect Wallet
+            Connect Wallet
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'admin' ? styles.tabActive : ''}`}
@@ -136,14 +136,13 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
               setError('');
             }}
           >
-            🔐 Admin Login
+            Admin Login
           </button>
         </div>
 
         <div className={styles.content}>
           {activeTab === 'wallet' ? (
             <div className={styles.walletTab}>
-              <div className={styles.walletIcon}>🌊</div>
               <h3>Connect Your Sui Wallet</h3>
               <p className={styles.description}>
                 Connect your Sui wallet to start playing, earning rewards, and managing your account.
@@ -151,7 +150,6 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
 
               {walletAddress ? (
                 <div className={styles.connectedInfo}>
-                  <div className={styles.successIcon}>✅</div>
                   <p className={styles.successText}>Wallet Connected!</p>
                   <p className={styles.walletAddress}>
                     {walletAddress.slice(0, 10)}...{walletAddress.slice(-8)}
@@ -162,20 +160,9 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
                   <ConnectButton />
                 </div>
               )}
-
-              <div className={styles.walletInfo}>
-                <h4>Why Connect?</h4>
-                <ul>
-                  <li>✨ Play the game and earn SUI rewards</li>
-                  <li>💎 Access your inventory and items</li>
-                  <li>📊 Track your progress and statistics</li>
-                  <li>🎁 Claim daily rewards and treasures</li>
-                </ul>
-              </div>
             </div>
           ) : (
             <div className={styles.adminTab}>
-              <div className={styles.adminIcon}>👤</div>
               <h3>Admin Dashboard Access</h3>
               <p className={styles.description}>
                 Sign in with your admin credentials to access the management dashboard.
@@ -183,7 +170,7 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
 
               {error && (
                 <div className={styles.error}>
-                  ⚠️ {error}
+                  {error}
                 </div>
               )}
 
@@ -219,15 +206,9 @@ export function ConnectModal({ isOpen, onClose }: ConnectModalProps) {
                   className={styles.loginButton}
                   disabled={isLoading}
                 >
-                  {isLoading ? '⏳ Signing in...' : '🔐 Sign In to Dashboard'}
+                  {isLoading ? 'Signing in...' : 'Sign In to Dashboard'}
                 </button>
               </form>
-
-              <div className={styles.adminNote}>
-                <p>💡 <strong>Test Credentials:</strong></p>
-                <p>Username: <code>admin</code></p>
-                <p>Password: <code>suiharvest2025</code></p>
-              </div>
             </div>
           )}
         </div>

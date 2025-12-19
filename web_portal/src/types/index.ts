@@ -371,8 +371,8 @@ export interface GameState {
   epicCasesOpened: number;
   totalFreeSpinsReceived: number;
   
-  // Daily Limits (resets at 00:00)
-  lastCaseOpenDate?: string; // ISO date to track daily reset
+  // Daily Limits (resets every 24 hours real-time)
+  lastCaseResetTime?: string; // ISO timestamp when the 24h cycle started
   casesOpenedToday: number; // Current count (max 3)
   
   // Last Session

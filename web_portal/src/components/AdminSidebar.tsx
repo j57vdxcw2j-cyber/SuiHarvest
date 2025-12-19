@@ -43,33 +43,38 @@ export function AdminSidebar({ currentPage, onNavigate, adminUsername, adminRole
 
       {/* Account Section */}
       <div className={styles.accountSection}>
-        <div className={styles.accountInfo}>
-          <div className={styles.accountDetails}>
-            <p className={styles.accountLabel}>👤 {adminUsername || 'Admin'}</p>
-            <p className={styles.accountAddress}>
-              {adminRole && <span style={{ 
-                fontSize: '10px', 
-                padding: '2px 8px', 
-                borderRadius: '10px', 
-                backgroundColor: adminRole.toLowerCase() === 'admin' ? '#dc354580' : '#3b82f680',
-                color: 'white',
-                marginRight: '6px',
-                textTransform: 'uppercase',
-                fontWeight: 600
-              }}>{adminRole}</span>}
-              {walletAddress ? (
-                <span style={{ fontSize: '11px', opacity: 0.7 }}>
-                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                </span>
-              ) : (
-                <span style={{ fontSize: '11px', opacity: 0.5, color: '#ff6b6b' }}>No wallet connected</span>
-              )}
-            </p>
+        {/* Admin Profile */}
+        <div className={styles.adminProfile}>
+          <div className={styles.profileHeader}>
+            <div className={styles.profileAvatar}>
+              {adminUsername ? adminUsername.charAt(0).toUpperCase() : 'A'}
+            </div>
+            <div className={styles.profileInfo}>
+              <p className={styles.profileName}>{adminUsername || 'Admin'}</p>
+              <span className={`${styles.roleBadge} ${styles[`role${adminRole?.toLowerCase() || 'viewer'}`]}`}>
+                {adminRole || 'Viewer'}
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Wallet Status */}
+        <div className={styles.walletStatus}>
+          <div className={styles.walletLabel}>Connected Wallet</div>
+          {walletAddress ? (
+            <div className={styles.walletAddress}>
+              <span className={styles.walletDot}></span>
+              <code>{walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}</code>
+            </div>
+          ) : (
+            <div className={styles.walletDisconnected}>
+              <span className={styles.walletDotOff}></span>
+              No wallet connected
+            </div>
+          )}
+        </div>
+
         <button className={styles.logoutButton} onClick={onLogout}>
-          <span>🚪</span>
           <span>Logout</span>
         </button>
       </div>

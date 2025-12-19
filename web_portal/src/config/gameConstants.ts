@@ -25,9 +25,9 @@ export const GAME_CONSTANTS: GameConstants = {
   MAX_CASES_PER_DAY: 3, // Maximum 3 cases per real-time day
   
   CASE_RARITY_RATES: {
-    COMMON: 70,    // 70% chance - Easy contracts
-    ADVANCED: 25,  // 25% chance - Medium difficulty
-    EPIC: 5        // 5% chance - Great rewards + FREE SPIN
+    COMMON: 75,    // 75% chance - LOW rewards (player LOSES money)
+    ADVANCED: 22,  // 22% chance - Breakeven or slight loss
+    EPIC: 3        // 3% chance - HIGH rewards (player PROFITS) + FREE SPIN
   },
   
   STAMINA_COSTS: {
@@ -280,14 +280,14 @@ export const CASE_CONTRACT_TEMPLATES: {
   advanced: Contract[];
   epic: Contract[];
 } = {
-  // Common Cases (70%) - Similar to Basic contracts
+  // Common Cases (75%) - LOW rewards, player LOSES money (cost 0.75 SUI)
   common: [
     {
       id: 'common_1',
       difficulty: 'basic' as ContractDifficulty,
       description: 'Giao 5 Cà rốt',
       requirements: { carrot: 5 },
-      rewards: { sui: 1.00, famePoints: 10 },
+      rewards: { sui: 0.30, famePoints: 10 },
       spawnRate: 20
     },
     {
@@ -295,7 +295,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'basic' as ContractDifficulty,
       description: 'Giao 6 Khoai tây',
       requirements: { potato: 6 },
-      rewards: { sui: 1.05, famePoints: 10 },
+      rewards: { sui: 0.35, famePoints: 10 },
       spawnRate: 20
     },
     {
@@ -303,7 +303,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'basic' as ContractDifficulty,
       description: 'Giao 8 Lúa mì',
       requirements: { wheat: 8 },
-      rewards: { sui: 1.10, famePoints: 10 },
+      rewards: { sui: 0.40, famePoints: 10 },
       spawnRate: 20
     },
     {
@@ -311,7 +311,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'basic' as ContractDifficulty,
       description: 'Giao 5 Gỗ',
       requirements: { wood: 5 },
-      rewards: { sui: 1.00, famePoints: 10 },
+      rewards: { sui: 0.45, famePoints: 10 },
       spawnRate: 20
     },
     {
@@ -319,19 +319,19 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'basic' as ContractDifficulty,
       description: 'Giao 3 Đá',
       requirements: { stone: 3 },
-      rewards: { sui: 1.15, famePoints: 10 },
+      rewards: { sui: 0.50, famePoints: 10 },
       spawnRate: 20
     }
   ],
   
-  // Advanced Cases (25%) - Similar to Advanced contracts
+  // Advanced Cases (22%) - Breakeven or slight loss
   advanced: [
     {
       id: 'advanced_1',
       difficulty: 'advanced' as ContractDifficulty,
       description: 'Giao 10 Gỗ và 4 Đá',
       requirements: { wood: 10, stone: 4 },
-      rewards: { sui: 1.50, famePoints: 25 },
+      rewards: { sui: 0.65, famePoints: 25 },
       spawnRate: 33
     },
     {
@@ -339,7 +339,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'advanced' as ContractDifficulty,
       description: 'Giao 8 Gỗ và 2 Than',
       requirements: { wood: 8, coal: 2 },
-      rewards: { sui: 1.60, famePoints: 25 },
+      rewards: { sui: 0.70, famePoints: 25 },
       spawnRate: 33
     },
     {
@@ -347,19 +347,19 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'advanced' as ContractDifficulty,
       description: 'Giao 15 Gỗ và 1 Than',
       requirements: { wood: 15, coal: 1 },
-      rewards: { sui: 1.45, famePoints: 25 },
+      rewards: { sui: 0.60, famePoints: 25 },
       spawnRate: 34
     }
   ],
   
-  // Epic Cases (5%) - EASY requirements + HIGH rewards + FREE SPIN
+  // Epic Cases (3%) - EASY requirements + HIGH rewards (player PROFITS) + FREE SPIN
   epic: [
     {
       id: 'epic_1',
       difficulty: 'expert' as ContractDifficulty, // Still marked expert for rewards tracking
       description: '🌟 EPIC! Giao chỉ 3 Gỗ',
       requirements: { wood: 3 },
-      rewards: { sui: 2.50, famePoints: 80 }, // Much better than normal expert
+      rewards: { sui: 1.50, famePoints: 80 }, // +0.75 SUI profit
       spawnRate: 30
     },
     {
@@ -367,7 +367,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'expert' as ContractDifficulty,
       description: '🌟 EPIC! Giao 5 Cà rốt và 2 Đá',
       requirements: { carrot: 5, stone: 2 },
-      rewards: { sui: 2.80, famePoints: 80 },
+      rewards: { sui: 2.00, famePoints: 80 }, // +1.25 SUI profit
       spawnRate: 30
     },
     {
@@ -375,7 +375,7 @@ export const CASE_CONTRACT_TEMPLATES: {
       difficulty: 'expert' as ContractDifficulty,
       description: '🌟 EPIC! Giao 8 Lúa mì',
       requirements: { wheat: 8 },
-      rewards: { sui: 3.00, famePoints: 100 }, // Instant chest eligible!
+      rewards: { sui: 2.50, famePoints: 100 }, // +1.75 SUI profit, Instant chest eligible!
       spawnRate: 40
     }
   ]
