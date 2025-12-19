@@ -1,0 +1,452 @@
+.roadmapContainer {
+  min-height: 100vh;
+  background: #0A1929;
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 40px;
+}
+
+.backButton:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateX(-4px);
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 100px;
+  padding: 40px 20px;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 20px rgba(59, 130, 246, 0.3);
+}
+
+.hero p {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.sectionTitle {
+  font-size: 42px;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+/* Timeline */
+.timelineSection {
+  position: relative;
+  margin-bottom: 120px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.timelineLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(59, 130, 246, 0.5),
+    rgba(16, 185, 129, 0.5),
+    rgba(139, 92, 246, 0.5),
+    rgba(245, 158, 11, 0.5)
+  );
+  transform: translateX(-50%);
+}
+
+.phaseContainer {
+  position: relative;
+  margin-bottom: 60px;
+}
+
+.phaseMarker {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 6px rgba(10, 25, 41, 1), 0 0 20px currentColor;
+  z-index: 2;
+}
+
+.phaseCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 40px;
+  margin-left: calc(50% + 40px);
+  transition: all 0.4s ease;
+}
+
+.phaseContainer:nth-child(even) .phaseCard {
+  margin-left: 0;
+  margin-right: calc(50% + 40px);
+}
+
+.phaseCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.phaseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.phaseQuarter {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.phaseTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 8px;
+}
+
+.phaseStatus {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.phaseProgress {
+  position: relative;
+}
+
+.progressCircle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.progressText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+/* Milestones */
+.milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.milestone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.milestone:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.milestoneIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.milestone.completed .milestoneIcon {
+  background: rgba(16, 185, 129, 0.2);
+  color: rgba(16, 185, 129, 0.9);
+  border: 2px solid rgba(16, 185, 129, 0.5);
+}
+
+.milestone.in-progress .milestoneIcon {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgba(59, 130, 246, 0.9);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+}
+
+.milestone.pending .milestoneIcon {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.milestoneTitle {
+  flex: 1;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.milestone.completed .milestoneTitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.milestone.pending .milestoneTitle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Features Section */
+.featuresSection {
+  margin-bottom: 100px;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 35px;
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.featureIcon {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.featureCard h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 12px;
+}
+
+.featureCard p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.featureEta {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  color: rgba(59, 130, 246, 0.9);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Community Section */
+.communitySection {
+  margin-bottom: 60px;
+}
+
+.communityCard {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 60px;
+  text-align: center;
+}
+
+.communityCard h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.communityCard p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+.communityButton {
+  padding: 16px 40px;
+  background: rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.communityButton:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .phasesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .phasesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .roadmapContainer {
+    padding-top: 90px;
+    padding-bottom: 60px;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .sectionTitle {
+    font-size: 32px;
+  }
+
+  .timelineLine {
+    left: 20px;
+  }
+
+  .phaseMarker {
+    left: 20px;
+  }
+
+  .phaseCard {
+    margin-left: 60px !important;
+    margin-right: 0 !important;
+  }
+
+  .phaseHeader {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .phaseTitle {
+    font-size: 22px;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .communityCard {
+    padding: 40px 20px;
+  }
+
+  .communityCard h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .roadmapContainer {
+    padding-top: 80px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .sectionTitle {
+    font-size: 26px;
+  }
+
+  .phaseCard {
+    padding: 20px;
+    margin-left: 50px !important;
+  }
+
+  .phaseTitle {
+    font-size: 18px;
+  }
+
+  .communityCard {
+    padding: 30px 15px;
+  }
+
+  .communityCard h2 {
+    font-size: 24px;
+  }
+}

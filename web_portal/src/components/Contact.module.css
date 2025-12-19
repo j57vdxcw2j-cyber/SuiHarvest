@@ -1,0 +1,177 @@
+.contactFormButton {
+  padding: 16px 48px;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  width: 100%;
+  margin-top: 10px;
+}
+
+.contactFormButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+}
+
+.contactFormButton:active {
+  transform: translateY(0);
+}
+.contactForm button[type="submit"] {
+  padding: 16px 48px;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  width: 100%;
+  margin-top: 10px;
+}
+
+.contactForm button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+}
+
+.contactForm button[type="submit"]:active {
+  transform: translateY(0);
+}
+.contactContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A1929 0%, #132F4C 100%);
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  padding-top: 40px;
+}
+
+.contactGrid > div:first-child h1 {
+  font-size: 48px;
+  margin-bottom: 24px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.contactGrid > div:first-child p {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 40px;
+  font-size: 20px;
+}
+
+.contactItem {
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contactForm {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 60px 40px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #3B82F6;
+  background: rgba(59,130,246,0.08);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+@media (max-width: 1024px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contactContainer {
+    padding-top: 90px;
+  }
+
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .contactForm {
+    padding: 20px;
+  }
+
+  .contactGrid > div:first-child h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contactContainer {
+    padding-top: 80px;
+  }
+
+  .contactGrid > div:first-child h1 {
+    font-size: 24px;
+  }
+
+  .contactGrid > div:first-child p {
+    font-size: 14px;
+  }
+
+  .contactForm {
+    padding: 15px;
+  }
+
+  .contactForm input,
+  .contactForm textarea,
+  .contactForm button {
+    font-size: 14px;
+  }
+}

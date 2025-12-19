@@ -1,0 +1,295 @@
+.fixedLogo {
+  position: fixed;
+  top: 25px;
+  left: 30px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0 20px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  height: 70px;
+  transition: all 0.3s ease;
+}
+
+.fixedLogo:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.logoImage {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.fixedWallet {
+  position: fixed;
+  top: 25px;
+  right: 30px;
+  z-index: 100;
+}
+
+.walletBtn {
+  padding: 0 32px;
+  font-size: 16px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  border-radius: 40px;
+  background: rgba(62, 125, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(62, 125, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(62, 125, 255, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.walletBtn:hover {
+  background: rgba(62, 125, 255, 0.25);
+  border-color: rgba(62, 125, 255, 0.5);
+  box-shadow: 0 12px 40px rgba(62, 125, 255, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.dropdownArrow {
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.walletDropdown {
+  position: absolute;
+  top: 80px;
+  right: 0;
+  background: rgba(10, 25, 41, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  min-width: 200px;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+  z-index: 1000;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dropdownItem:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.navPill {
+  position: fixed;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 70px;
+  transition: all 0.3s ease;
+}
+
+.navIndicator {
+  position: absolute;
+  top: 8px;
+  height: 54px;
+  background: rgba(62, 125, 255, 0.2);
+  border: 1px solid rgba(62, 125, 255, 0.4);
+  border-radius: 40px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 0;
+  box-shadow: 0 4px 16px rgba(62, 125, 255, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.navLinkBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0 28px;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.navLinkBtn:hover {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navLinkBtn.active {
+  background: transparent;
+  border: 1px solid transparent;
+  color: white;
+}
+
+.animatedGrid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: 
+    linear-gradient(rgba(62, 125, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62, 125, 255, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes gridMove {
+  0% {
+    background-position: 40px -40px;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navPill {
+    gap: 4px;
+  }
+
+  .navLinkBtn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
+  .fixedLogo {
+    font-size: 17px;
+    padding: 7px 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fixedLogo {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+
+  .navPill {
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .navLinkBtn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fixedLogo {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+
+  .navPill {
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .navLinkBtn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Sui Wallet Connect Button Styles */
+.connectButtonWrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* Override default ConnectButton styles */
+:global(.dapp-kit-button) {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  padding: 12px 26px !important;
+  border-radius: 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+:global(.dapp-kit-button:hover) {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 1) 0%, rgba(139, 92, 246, 1) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.5),
+              0 0 40px rgba(59, 130, 246, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+:global(.dapp-kit-button:active) {
+  transform: translateY(0) !important;
+}
