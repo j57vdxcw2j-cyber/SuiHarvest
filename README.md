@@ -1,2 +1,1338 @@
-# SuiHarvest
-Mini-Hackathon Project
+# 🌾 SuiHarvest
+
+> A Blockchain-Powered Farming Game on Sui Network
+
+[![Sui Network](https://img.shields.io/badge/Sui-Network-4DA2FF?style=flat&logo=sui&logoColor=white)](https://sui.io/)
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-v12-FFCA28?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/)
+
+**SuiHarvest** is a Web3 farming simulation game built on the Sui blockchain, combining traditional farming game mechanics with blockchain technology. Players can farm crops, mine resources, craft tools, and earn rewards through on-chain interactions.
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Setup & Installation](#-setup--installation)
+- [Building Plan](#-building-plan)
+- [Web Implementation](#-web-implementation)
+- [Game Implementation](#-game-implementation)
+- [Smart Contract Structure](#-smart-contract-structure)
+- [Smart Contract Logic](#-smart-contract-logic)
+- [Guidelines](#-guidelines)
+- [Deployment](#-deployment)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## 🎮 Overview
+
+SuiHarvest is a decentralized farming game where players:
+- Pay a daily entry fee (0.75 SUI) to access the game
+- Manage stamina to perform various farming activities
+- Complete contracts to earn Fame Points and rewards
+- Collect and trade NFT items (seeds, crops, ores, tools)
+- Compete on leaderboards and unlock treasure chests
+
+The game integrates:
+- **Sui Blockchain** for transparent, trustless transactions
+- **Firebase** for user management and game state
+- **React** for responsive, modern UI
+- **TypeScript** for type-safe development
+
+---
+
+## ✨ Features
+
+### 🎯 Core Gameplay
+- **Daily Entry System**: Pay 0.75 SUI to play each day
+- **Stamina Management**: 50 stamina points for strategic gameplay
+- **Multiple Activities**:
+  - 🌱 **Farm**: Plant and harvest crops (15 stamina)
+  - 🪓 **Chop Wood**: Gather wood resources (10 stamina)
+  - ⛏️ **Mine Stone**: Extract stone materials (10 stamina)
+- **Contract System**: Complete tasks for rewards and Fame Points
+- **Inventory Management**: Collect and organize items
+- **Treasure Chests**: Unlock rewards based on Fame Points milestones
+
+### 👤 User Features
+- 🔐 **Wallet Authentication**: Connect with Sui Wallet
+- 📊 **Profile Dashboard**: Track progress and stats
+- 🎒 **Inventory System**: Manage seeds, crops, ores, and tools
+- 🏆 **Fame Points**: Earn reputation through gameplay
+- 💰 **Reward Claims**: Withdraw earnings from contracts
+
+### 👑 Admin Dashboard
+- 🏦 **Treasury Management**: Monitor and manage game treasury
+- 👥 **Account Management**: Track users and their activity
+- 🎮 **Game Maintenance**: Control game settings and parameters
+- 📈 **Analytics**: Real-time statistics and transaction monitoring
+- 🔒 **Secure Access**: Multi-layer authentication with wallet verification
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 19.2** - UI framework
+- **TypeScript 5.9** - Type safety
+- **Vite** - Build tool and dev server
+- **CSS Modules** - Scoped styling
+- **@mysten/dapp-kit** - Sui wallet integration
+- **@tanstack/react-query** - State management
+
+### Backend
+- **Firebase Authentication** - User authentication
+- **Firestore Database** - Game state and user data
+- **Firebase Storage** - Asset storage (ready)
+- **Cloud Functions** - Serverless backend (ready)
+
+### Blockchain
+- **Sui Network (Testnet)** - Blockchain infrastructure
+- **Move Language** - Smart contract development
+- **@mysten/sui.js** - Sui SDK for JavaScript
+
+### Development Tools
+- **ESLint** - Code linting
+- **TypeScript ESLint** - TS linting rules
+- **Vite Preview** - Production build testing
+
+---
+
+## 📁 Project Structure
+
+```
+SuiHarvest/
+├── 📂 web_portal/                    # Frontend application
+│   ├── 📂 src/
+│   │   ├── 📂 components/            # React components
+│   │   │   ├── Home.tsx              # Landing page
+│   │   │   ├── Wiki.tsx              # Documentation
+│   │   │   ├── Game.tsx              # Main game interface
+│   │   │   ├── Contact.tsx           # Contact form
+│   │   │   ├── AdminDashboard.tsx    # Admin main page
+│   │   │   ├── AdminSidebar.tsx      # Admin navigation
+│   │   │   ├── SuiManagement.tsx     # Treasury operations
+│   │   │   ├── AccountManagement.tsx # User monitoring
+│   │   │   ├── MaintenanceManagement.tsx # Game settings
+│   │   │   ├── Navigation.tsx        # Main navigation
+│   │   │   └── ConnectModal.tsx      # Wallet connection
+│   │   │
+│   │   ├── 📂 config/
+│   │   │   └── firebase.ts           # Firebase configuration
+│   │   │
+│   │   ├── 📂 services/
+│   │   │   ├── authService.ts        # Authentication logic
+│   │   │   ├── userService.ts        # User data management
+│   │   │   ├── gameStateService.ts   # Game state management
+│   │   │   └── suiBlockchainService.ts # Blockchain interactions
+│   │   │
+│   │   ├── 📂 contexts/
+│   │   │   └── AuthContext.tsx       # Auth state provider
+│   │   │
+│   │   ├── 📂 types/
+│   │   │   └── index.ts              # TypeScript type definitions
+│   │   │
+│   │   ├── 📂 styles/
+│   │   │   └── globals.css           # Global styles
+│   │   │
+│   │   ├── App.tsx                   # Root component
+│   │   └── main.tsx                  # Entry point
+│   │
+│   ├── 📂 public/                    # Static assets
+│   ├── package.json                  # Dependencies
+│   ├── tsconfig.json                 # TypeScript config
+│   ├── vite.config.ts                # Vite config
+│   └── .env                          # Environment variables
+│
+├── 📂 sui_contracts/                 # Smart contracts
+│   ├── 📂 sources/
+│   │   ├── inventory.move            # NFT items (Seed, Crop, Ore, Tool)
+│   │   └── trader.move               # Trading & crafting logic
+│   │
+│   ├── 📂 tests/
+│   │   ├── inventory_tests.move      # Inventory tests
+│   │   └── trader_tests.move         # Trader tests
+│   │
+│   ├── Move.toml                     # Move package config
+│   └── 📂 build/                     # Compiled bytecode
+│
+├── 📂 design_assets/                 # Game assets
+│   ├── 📂 characters/                # Character sprites
+│   ├── 📂 environment/               # Environment tiles
+│   ├── 📂 items_icons/               # Item icons
+│   ├── 📂 ui/                        # UI elements
+│   └── 📂 audio/                     # Sound effects & music
+│
+└── README.md                         # This file
+```
+
+---
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+
+Before you begin, ensure you have:
+- **Node.js** v18+ and npm
+- **Sui Wallet** browser extension ([Install](https://chrome.google.com/webstore/detail/sui-wallet))
+- **Firebase Account** ([Sign up](https://firebase.google.com/))
+- **Sui CLI** (optional, for smart contract development)
+- **Git** for version control
+
+### Installation Steps
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/SuiHarvest.git
+cd SuiHarvest
+```
+
+#### 2. Frontend Setup
+
+```bash
+# Navigate to web portal
+cd web_portal
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+```
+
+#### 3. Configure Environment Variables
+
+Edit `web_portal/.env` with your Firebase credentials:
+
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+
+# Sui Contract Configuration (Update after deployment)
+VITE_SUI_PACKAGE_ID=0x...
+VITE_SUI_TREASURY_ID=0x...
+VITE_SUI_ADMIN_CAP_ID=0x...
+```
+
+#### 4. Firebase Setup
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable **Authentication** → **Anonymous** provider
+4. Create **Firestore Database** (Start in test mode)
+5. Copy configuration to `.env`
+
+**Firestore Collections** (auto-created on first use):
+```
+users/              # User profiles & game state
+gameSessions/       # Daily gameplay sessions
+transactions/       # Financial transactions
+activities/         # Activity logs
+treasureChests/     # Fame Points rewards
+admin_accounts/     # Admin accounts
+```
+
+#### 5. Run Development Server
+
+```bash
+# From web_portal directory
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+#### 6. Smart Contract Deployment (Optional)
+
+```bash
+# Navigate to contracts directory
+cd sui_contracts
+
+# Build contracts
+sui move build
+
+# Test contracts
+sui move test
+
+# Deploy to Sui Testnet
+sui client publish --gas-budget 100000000
+```
+
+After deployment, update `.env` with the package IDs.
+
+---
+
+## 📐 Building Plan
+
+### Phase 1: Foundation ✅
+- [x] Project structure setup
+- [x] Firebase integration
+- [x] Basic UI components (Home, Wiki, Contact)
+- [x] Wallet connection system
+- [x] Authentication flow
+
+### Phase 2: Core Game ✅
+- [x] Game interface design
+- [x] Stamina system
+- [x] Action buttons (Farm, Chop, Mine)
+- [x] Contract system
+- [x] Inventory management
+- [x] Fame Points tracking
+- [x] Daily entry fee integration
+
+### Phase 3: Admin Dashboard ✅
+- [x] Admin authentication
+- [x] Treasury management UI
+- [x] Account management system
+- [x] Transaction monitoring
+- [x] Game maintenance controls
+- [x] Real-time statistics
+
+### Phase 4: Smart Contracts ✅
+- [x] Inventory module (NFT items)
+- [x] Trader module (buy/sell/craft)
+- [x] Treasury system
+- [x] Admin capabilities
+- [x] Test coverage
+
+### Phase 5: Integration & Polish 🔄
+- [ ] Full blockchain integration
+- [ ] End-to-end testing
+- [ ] Performance optimization
+- [ ] Security audit
+- [ ] Production deployment
+
+### Phase 6: Future Features 📝
+- [ ] Multiplayer interactions
+- [ ] Guild system
+- [ ] Advanced crafting recipes
+- [ ] Seasonal events
+- [ ] Mobile app version
+
+---
+
+## 💻 Web Implementation
+
+### Architecture
+
+The web portal follows a modern React architecture with separation of concerns:
+
+```
+Components → Services → Firebase/Blockchain
+    ↓           ↓            ↓
+  UI Logic   Business    Data Layer
+             Logic
+```
+
+### Key Components
+
+#### 1. **Navigation System**
+- Hash-based routing (`/#home`, `/#wiki`, `/#game`, etc.)
+- Responsive navigation bar
+- Mobile-friendly menu
+
+```typescript
+// App.tsx - Route handling
+const renderPage = () => {
+  switch (location.hash) {
+    case '#home': return <Home />;
+    case '#wiki': return <Wiki />;
+    case '#game': return <Game />;
+    // ...
+  }
+}
+```
+
+#### 2. **Authentication Flow**
+
+**User Authentication:**
+```typescript
+// 1. Connect wallet
+const connectWallet = async () => {
+  await connect();
+  const address = currentAccount.address;
+  
+  // 2. Check/create user profile
+  const user = await getUserProfile(address);
+  if (!user) {
+    await createUser(address);
+  }
+}
+```
+
+**Admin Authentication:**
+```typescript
+// 1. Navigate to /#admin
+// 2. Enter username + password
+// 3. Connect wallet
+// 4. Verify wallet address matches admin list
+// 5. Grant admin access
+```
+
+#### 3. **Game Component**
+
+The main game interface manages:
+- **State Management**: Stamina, inventory, contracts
+- **Action Handlers**: Farm, chop, mine
+- **Contract System**: Create, progress, complete
+- **Real-time Updates**: Firebase listeners
+
+```typescript
+const handleFarm = async () => {
+  if (stamina < 15) return showError('Not enough stamina');
+  
+  // Deduct stamina
+  setStamina(prev => prev - 15);
+  
+  // Update game state
+  await updateGameSession({
+    stamina: stamina - 15,
+    actions: [...actions, { type: 'farm', timestamp: Date.now() }]
+  });
+  
+  // Blockchain interaction (optional)
+  await buyAndHarvestSeed();
+}
+```
+
+#### 4. **Admin Dashboard**
+
+Three main sections:
+
+**A. Sui Management**
+- Display treasury balance
+- Deposit/withdraw SUI
+- Transaction history
+
+**B. Account Management**
+- User list with stats
+- Activity monitoring
+- Transaction logs
+
+**C. Maintenance Management**
+- Game settings (entry fee, stamina costs)
+- Enable/disable features
+- Announcement system
+
+### Services Layer
+
+#### authService.ts
+```typescript
+- signInWithWallet(address: string)
+- signOut()
+- getCurrentUser()
+- isAdmin(address: string)
+```
+
+#### userService.ts
+```typescript
+- createUser(address: string)
+- getUserProfile(address: string)
+- updateUserProfile(data: Partial<User>)
+- recordTransaction(tx: Transaction)
+- recordActivity(activity: Activity)
+```
+
+#### gameStateService.ts
+```typescript
+- createGameSession(userId: string)
+- updateGameSession(data: Partial<GameSession>)
+- submitContract(contract: Contract)
+- claimRewards(contractId: string)
+```
+
+#### suiBlockchainService.ts
+```typescript
+- payDailyEntryFee(amount: number)
+- buyAndHarvestSeed()
+- sellCrop(cropId: string)
+- craftTool(ores: Ore[])
+- adminDepositToTreasury(amount: number)
+```
+
+### Styling System
+
+**CSS Modules** for component-scoped styles:
+
+```css
+/* Component.module.css */
+.container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  backdrop-filter: blur(10px);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+```
+
+**Global Styles** in `globals.css`:
+```css
+:root {
+  --color-primary: #667eea;
+  --color-secondary: #764ba2;
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+```
+
+### State Management
+
+**React Hooks** for local state:
+```typescript
+const [stamina, setStamina] = useState(50);
+const [inventory, setInventory] = useState<Item[]>([]);
+const [contracts, setContracts] = useState<Contract[]>([]);
+```
+
+**Context API** for global state:
+```typescript
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  return (
+    <AuthContext.Provider value={{ user, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+**React Query** for server state:
+```typescript
+const { data, isLoading } = useQuery({
+  queryKey: ['user', address],
+  queryFn: () => getUserProfile(address)
+});
+```
+
+---
+
+## 🎮 Game Implementation
+
+### Game Loop
+
+```
+1. Daily Entry (0.75 SUI)
+   ↓
+2. Receive 50 Stamina
+   ↓
+3. Choose Actions:
+   - Farm (15 stamina) → Get crops
+   - Chop Wood (10 stamina) → Get wood
+   - Mine Stone (10 stamina) → Get stone
+   ↓
+4. Complete Contracts
+   ↓
+5. Earn Fame Points
+   ↓
+6. Unlock Treasure Chests
+   ↓
+7. Claim Rewards
+```
+
+### Stamina System
+
+```typescript
+interface StaminaConfig {
+  maxStamina: 50,
+  costs: {
+    farm: 15,
+    chopWood: 10,
+    mineStone: 10
+  }
+}
+
+// Stamina regeneration (not yet implemented)
+// - 1 point per 10 minutes
+// - Or buy stamina refill (future feature)
+```
+
+### Contract System
+
+```typescript
+interface Contract {
+  id: string;
+  type: 'daily' | 'weekly' | 'special';
+  requirements: {
+    action: 'farm' | 'chop' | 'mine';
+    count: number;
+  };
+  rewards: {
+    fame: number;
+    sui: number;
+  };
+  progress: number;
+  status: 'active' | 'completed' | 'claimed';
+}
+
+// Example contract
+{
+  type: 'daily',
+  requirements: { action: 'farm', count: 3 },
+  rewards: { fame: 10, sui: 0.5 },
+  progress: 2, // 2/3 completed
+  status: 'active'
+}
+```
+
+### Inventory System
+
+Items are stored both:
+- **On-chain**: NFTs owned by user wallet
+- **Off-chain**: Firestore for quick access
+
+```typescript
+interface Inventory {
+  seeds: Seed[];
+  crops: Crop[];
+  ores: Ore[];
+  tools: Tool[];
+}
+
+interface Seed {
+  id: string;
+  rarity: 'common' | 'rare' | 'epic';
+  plantType: 'wheat' | 'corn' | 'potato' | 'carrot' | 'tomato';
+}
+
+interface Crop {
+  id: string;
+  rarity: 'common' | 'rare' | 'epic';
+  plantType: string;
+  quality: 'low' | 'medium' | 'high';
+}
+
+interface Ore {
+  id: string;
+  type: 'stone' | 'iron' | 'gold';
+}
+
+interface Tool {
+  id: string;
+  type: 'pickaxe' | 'axe' | 'hoe';
+  level: number;
+  durability: number;
+}
+```
+
+### Fame Points System
+
+```typescript
+// Earn fame through:
+- Completing contracts: 10-50 fame per contract
+- Daily streak: +5 fame per consecutive day
+- Special achievements: 100+ fame
+
+// Fame milestones unlock treasure chests:
+- Bronze Chest: 100 fame → 1 SUI reward
+- Silver Chest: 500 fame → 5 SUI reward
+- Gold Chest: 1000 fame → 10 SUI reward
+- Legendary Chest: 5000 fame → 50 SUI reward
+```
+
+### Trading Mechanics
+
+```typescript
+// Buy Seed (100 MIST = 0.0001 SUI)
+buyAndHarvestSeed() → Seed NFT → Plant → Crop NFT
+
+// Sell Crop
+sellCrop(crop) → Receive SUI based on rarity:
+  - Common: 50 MIST
+  - Rare: 200 MIST
+  - Epic: 500 MIST
+
+// Craft Tool
+craftTool(ore1, ore2, ore3) → Tool NFT
+  - Requires 3 ores of same type
+  - Crafting fee: 50 MIST
+  - Tool level = ore type (1=stone, 2=iron, 3=gold)
+```
+
+### Game State Persistence
+
+```typescript
+// Firebase structure for game session
+interface GameSession {
+  userId: string;
+  date: string; // YYYY-MM-DD
+  stamina: number;
+  actions: Action[];
+  contracts: Contract[];
+  fame: number;
+  earnedToday: number;
+  entryFeePaid: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+// Real-time sync
+const unsubscribe = onSnapshot(
+  doc(db, 'gameSessions', sessionId),
+  (doc) => {
+    setGameState(doc.data());
+  }
+);
+```
+
+---
+
+## 🔐 Smart Contract Structure
+
+### Module Architecture
+
+```
+sui_contracts/
+├── inventory.move    # NFT item definitions & management
+└── trader.move       # Trading, crafting, & marketplace logic
+```
+
+### Inventory Module (`inventory.move`)
+
+**Purpose**: Define and manage NFT game items
+
+#### Structs
+
+```move
+// All structs have `key` (owned objects) and `store` (transferable)
+
+public struct Seed has key, store {
+    id: UID,
+    rarity: u8,        // 1=Common, 2=Rare, 3=Epic
+    plant_type: u8,    // 1-5 different plant types
+}
+
+public struct Crop has key, store {
+    id: UID,
+    rarity: u8,
+    plant_type: u8,
+    quality: u8,       // 1-3 quality tiers
+}
+
+public struct Ore has key, store {
+    id: UID,
+    ore_type: u8,      // 1=Stone, 2=Iron, 3=Gold
+}
+
+public struct Tool has key, store {
+    id: UID,
+    level: u8,         // Corresponds to ore type used
+    durability: u8,    // Max 100
+}
+```
+
+#### Functions
+
+**Minting** (package-only access):
+```move
+public(package) fun mint_seed(ctx: &mut TxContext, rarity: u8, plant_type: u8): Seed
+public(package) fun mint_crop(ctx: &mut TxContext, rarity: u8, plant_type: u8, quality: u8): Crop
+public(package) fun mint_ore(ctx: &mut TxContext, ore_type: u8): Ore
+public(package) fun mint_tool(ctx: &mut TxContext, level: u8, durability: u8): Tool
+```
+
+**Burning** (package-only access):
+```move
+public(package) fun burn_seed(seed: Seed)
+public(package) fun burn_crop(crop: Crop)
+public(package) fun burn_ore(ore: Ore)
+public(package) fun burn_tool(tool: Tool)
+```
+
+**Getters** (public read access):
+```move
+public fun seed_rarity(seed: &Seed): u8
+public fun seed_type(seed: &Seed): u8
+public fun crop_rarity(crop: &Crop): u8
+public fun ore_type(ore: &Ore): u8
+public fun tool_level(tool: &Tool): u8
+public fun tool_durability(tool: &Tool): u8
+```
+
+### Trader Module (`trader.move`)
+
+**Purpose**: Handle all economic transactions and crafting
+
+#### Shared Objects
+
+```move
+public struct HouseBank has key {
+    id: UID,
+    balance: Balance<SUI>,
+}
+
+// Created at initialization, shared with all players
+fun init(ctx: &mut TxContext) {
+    let bank = HouseBank {
+        id: object::new(ctx),
+        balance: balance::zero<SUI>(),
+    };
+    transfer::share_object(bank);
+}
+```
+
+#### Constants
+
+```move
+const SEED_PRICE: u64 = 100_000_000;      // 0.1 SUI
+const CRAFT_FEE: u64 = 50_000_000;        // 0.05 SUI
+const PRICE_COMMON: u64 = 50_000_000;     // 0.05 SUI
+const PRICE_RARE: u64 = 200_000_000;      // 0.2 SUI
+const PRICE_EPIC: u64 = 500_000_000;      // 0.5 SUI
+```
+
+#### Error Codes
+
+```move
+const E_INSUFFICIENT_PAYMENT: u64 = 1;
+const E_WRONG_ORE_TYPE: u64 = 2;
+const E_BANK_EMPTY: u64 = 3;
+const E_UNSUPPORTED_RARITY: u64 = 4;
+```
+
+---
+
+## ⚙️ Smart Contract Logic
+
+### 1. Buy Seed
+
+```move
+public fun buy_seed(
+    bank: &mut HouseBank,
+    payment: &mut Coin<SUI>,    // Use &mut to split payment
+    clock: &Clock,               // For randomness
+    ctx: &mut TxContext,
+)
+```
+
+**Flow**:
+1. Assert payment ≥ SEED_PRICE (100 MIST)
+2. Split exact payment from user's coin
+3. Deposit to HouseBank
+4. Generate random rarity (94% common, 4% rare, 2% epic)
+5. Generate random plant type (1-5)
+6. Mint Seed NFT
+7. Transfer to user
+
+**Key Features**:
+- Uses `coin::split()` to avoid losing excess payment
+- Pseudo-random using clock timestamp
+- NFT automatically sent to caller
+
+### 2. Harvest
+
+```move
+public fun harvest(seed: Seed, ctx: &mut TxContext)
+```
+
+**Flow**:
+1. Read seed's rarity and plant type
+2. Burn seed NFT
+3. Determine crop quality based on seed rarity
+4. Mint Crop NFT with same rarity/type
+5. Transfer to user
+
+**Logic**:
+```move
+let quality = if (rarity == 3) { 3 }      // Epic seed → High quality
+              else if (rarity == 2) { 2 }  // Rare seed → Medium quality
+              else { 1 };                  // Common seed → Low quality
+```
+
+### 3. Sell Crop
+
+```move
+public fun sell_crop(
+    bank: &mut HouseBank,
+    crop: Crop,
+    ctx: &mut TxContext,
+)
+```
+
+**Flow**:
+1. Read crop rarity
+2. Determine price (50/200/500 MIST)
+3. Assert bank has enough balance
+4. Burn crop NFT
+5. Take SUI from bank
+6. Transfer to user
+
+**Pricing Table**:
+```
+Rarity → Price
+Common → 50 MIST (0.00005 SUI)
+Rare   → 200 MIST (0.0002 SUI)
+Epic   → 500 MIST (0.0005 SUI)
+```
+
+### 4. Craft Tool
+
+```move
+public fun craft_tool(
+    bank: &mut HouseBank,
+    payment: &mut Coin<SUI>,
+    ore1: Ore,
+    ore2: Ore,
+    ore3: Ore,
+    ctx: &mut TxContext,
+)
+```
+
+**Flow**:
+1. Assert payment ≥ CRAFT_FEE (50 MIST)
+2. Split payment and deposit to bank
+3. Read ore types from all 3 ores
+4. Assert all ores are same type
+5. Burn all 3 ores
+6. Mint Tool with level = ore type, durability = 100
+7. Transfer to user
+
+**Crafting Table**:
+```
+3x Stone Ore → Stone Tool (Level 1)
+3x Iron Ore  → Iron Tool (Level 2)
+3x Gold Ore  → Gold Tool (Level 3)
+```
+
+### 5. Helper & Cheat Functions
+
+```move
+// Get price constants
+public fun price_common(): u64 { PRICE_COMMON }
+public fun price_rare(): u64 { PRICE_RARE }
+public fun price_epic(): u64 { PRICE_EPIC }
+
+// Testing: Mine ore for free
+public entry fun mine_ore(clock: &Clock, ctx: &mut TxContext)
+
+// Testing: Get epic seed for free
+public entry fun cheat_seed(ctx: &mut TxContext)
+```
+
+### Transaction Examples
+
+#### Example 1: Buy and Harvest
+
+```bash
+# 1. User calls buy_seed
+sui client call \
+  --package $PACKAGE_ID \
+  --module trader \
+  --function buy_seed \
+  --args $BANK_ID $COIN_ID $CLOCK_ID \
+  --gas-budget 10000000
+
+# Result: Seed NFT in user's wallet
+
+# 2. User calls harvest
+sui client call \
+  --package $PACKAGE_ID \
+  --module trader \
+  --function harvest \
+  --args $SEED_ID \
+  --gas-budget 10000000
+
+# Result: Crop NFT in user's wallet
+```
+
+#### Example 2: Craft Tool
+
+```bash
+# 1. User mines 3 ores (or uses cheat)
+sui client call \
+  --package $PACKAGE_ID \
+  --module trader \
+  --function mine_ore \
+  --args $CLOCK_ID \
+  --gas-budget 10000000
+
+# Repeat 3 times
+
+# 2. User crafts tool
+sui client call \
+  --package $PACKAGE_ID \
+  --module trader \
+  --function craft_tool \
+  --args $BANK_ID $COIN_ID $ORE1_ID $ORE2_ID $ORE3_ID \
+  --gas-budget 10000000
+
+# Result: Tool NFT in user's wallet
+```
+
+### Security Considerations
+
+#### 1. Payment Handling
+✅ **Correct**: Use `&mut Coin<SUI>` and `coin::split()`
+```move
+let paid_coin = coin::split(payment, SEED_PRICE, ctx);
+balance::join(&mut bank.balance, coin::into_balance(paid_coin));
+```
+
+❌ **Wrong**: Take entire coin
+```move
+balance::join(&mut bank.balance, coin::into_balance(payment));
+// User loses excess payment!
+```
+
+#### 2. Validation
+✅ Always validate inputs:
+```move
+assert!(coin::value(payment) >= SEED_PRICE, E_INSUFFICIENT_PAYMENT);
+assert!(type1 == type2 && type2 == type3, E_WRONG_ORE_TYPE);
+assert!(balance::value(&bank.balance) >= price, E_BANK_EMPTY);
+```
+
+#### 3. Object Lifecycle
+✅ Properly burn objects when consumed:
+```move
+let Seed { id, rarity: _, plant_type: _ } = seed;
+object::delete(id);
+```
+
+#### 4. Access Control
+✅ Use `public(package)` for internal functions:
+```move
+public(package) fun mint_seed(...) // Only callable by trader module
+```
+
+✅ Use `public` for user-facing functions:
+```move
+public fun buy_seed(...) // Anyone can call
+```
+
+---
+
+## 📚 Guidelines
+
+### For Developers
+
+#### Code Standards
+- **TypeScript**: Strict mode enabled
+- **Naming**: camelCase for variables/functions, PascalCase for components
+- **Components**: Functional components with hooks
+- **Styling**: CSS Modules for component styles
+- **Comments**: JSDoc for exported functions
+
+#### File Organization
+```
+ComponentName/
+├── ComponentName.tsx        # Component logic
+├── ComponentName.module.css # Component styles
+└── index.ts                 # Export file
+```
+
+#### Best Practices
+1. **State Management**: Keep state as local as possible
+2. **Error Handling**: Always use try-catch for async operations
+3. **Loading States**: Show loading indicators for async actions
+4. **Validation**: Validate user inputs before submission
+5. **Accessibility**: Use semantic HTML and ARIA labels
+
+#### Git Workflow
+```bash
+# 1. Create feature branch
+git checkout -b feature/your-feature-name
+
+# 2. Make changes and commit
+git add .
+git commit -m "feat: add your feature description"
+
+# 3. Push and create PR
+git push origin feature/your-feature-name
+```
+
+### For Smart Contract Development
+
+#### Move Best Practices
+1. **Object Ownership**: Use `key` for owned objects, `store` for transferable
+2. **Error Handling**: Define error constants at module level
+3. **Testing**: Write comprehensive test cases
+4. **Gas Efficiency**: Minimize storage and computation
+5. **Security**: Validate all inputs, use proper access control
+
+#### Testing
+```bash
+# Run all tests
+sui move test
+
+# Run specific test
+sui move test test_buy_seed
+
+# Run with coverage
+sui move test --coverage
+```
+
+#### Deployment Checklist
+- [ ] All tests passing
+- [ ] Error codes documented
+- [ ] Access control verified
+- [ ] Gas costs optimized
+- [ ] Audit completed (for mainnet)
+
+### For Users
+
+#### Getting Started
+1. Install Sui Wallet extension
+2. Get testnet SUI from faucet: https://discord.gg/sui
+3. Connect wallet to app
+4. Pay 0.75 SUI daily entry fee
+5. Start playing!
+
+#### Tips & Strategies
+- **Manage Stamina**: Plan your actions to maximize efficiency
+- **Complete Contracts**: Focus on daily contracts for steady fame growth
+- **Farm Epic Seeds**: Higher rarity = better profits
+- **Save for Tools**: Tools reduce action costs (future feature)
+- **Check Leaderboards**: Compete with other players
+
+#### Troubleshooting
+
+**Wallet Won't Connect**
+- Ensure Sui Wallet extension is installed
+- Check you're on the correct network (Testnet)
+- Refresh the page and try again
+
+**Transaction Failed**
+- Check you have enough SUI for gas fees
+- Verify you have sufficient balance
+- Wait a few seconds and retry
+
+**Game State Not Updating**
+- Refresh the page
+- Check your internet connection
+- Clear browser cache
+
+---
+
+## 🚀 Deployment
+
+### Frontend Deployment
+
+#### Option 1: Vercel (Recommended)
+
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Build project
+cd web_portal
+npm run build
+
+# 3. Deploy
+vercel --prod
+```
+
+#### Option 2: Netlify
+
+```bash
+# 1. Build project
+npm run build
+
+# 2. Deploy dist folder
+netlify deploy --prod --dir=dist
+```
+
+#### Option 3: Firebase Hosting
+
+```bash
+# 1. Install Firebase CLI
+npm install -g firebase-tools
+
+# 2. Initialize Firebase
+firebase init hosting
+
+# 3. Build and deploy
+npm run build
+firebase deploy --only hosting
+```
+
+### Environment Variables
+
+Set these in your deployment platform:
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_MEASUREMENT_ID=...
+VITE_SUI_PACKAGE_ID=...
+VITE_SUI_TREASURY_ID=...
+VITE_SUI_ADMIN_CAP_ID=...
+```
+
+### Smart Contract Deployment
+
+#### Deploy to Testnet
+
+```bash
+# 1. Build contracts
+cd sui_contracts
+sui move build
+
+# 2. Deploy
+sui client publish --gas-budget 100000000
+
+# 3. Save package ID
+# Look for "Published Objects" in output
+# Save packageObjectId to .env
+```
+
+#### Deploy to Mainnet
+
+```bash
+# 1. Ensure tests pass
+sui move test
+
+# 2. Switch to mainnet
+sui client switch --env mainnet
+
+# 3. Deploy with sufficient gas
+sui client publish --gas-budget 500000000
+
+# 4. Verify deployment
+sui client object <PACKAGE_ID>
+```
+
+### Post-Deployment
+
+1. **Update Configuration**
+   - Add contract IDs to `.env`
+   - Update Firebase security rules
+   - Configure CORS settings
+
+2. **Test Production**
+   - Verify wallet connection
+   - Test all game actions
+   - Check admin dashboard
+
+3. **Monitor**
+   - Set up Firebase Analytics
+   - Enable error tracking
+   - Monitor transaction logs
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Make your changes**
+4. **Commit your changes**
+   ```bash
+   git commit -m 'feat: add amazing feature'
+   ```
+5. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+6. **Open a Pull Request**
+
+### Commit Convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new feature
+fix: bug fix
+docs: documentation changes
+style: formatting changes
+refactor: code refactoring
+test: adding tests
+chore: maintenance tasks
+```
+
+### Code Review Process
+
+1. All PRs require at least one review
+2. Tests must pass
+3. Code must follow project standards
+4. Documentation must be updated
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👥 Team
+
+**SuiHarvest Team**
+- Developer: [Your Name]
+- Designer: [Designer Name]
+- Project Lead: [Lead Name]
+
+---
+
+## 🙏 Acknowledgments
+
+- **Sui Foundation** - For blockchain infrastructure
+- **Firebase** - For backend services
+- **React Team** - For the amazing framework
+- **Move Community** - For smart contract guidance
+- **Design Assets** - [Asset attribution if applicable]
+
+---
+
+## 📞 Contact & Support
+
+- **Website**: https://suiharvest.io (coming soon)
+- **Discord**: [Join our Discord](#)
+- **Twitter**: [@SuiHarvest](#)
+- **Email**: support@suiharvest.io
+
+---
+
+## 🗺️ Roadmap
+
+### Q1 2026
+- [ ] Launch on Sui Mainnet
+- [ ] Mobile app development
+- [ ] Guild system implementation
+
+### Q2 2026
+- [ ] Multiplayer features
+- [ ] Advanced crafting system
+- [ ] Seasonal events
+
+### Q3 2026
+- [ ] NFT marketplace integration
+- [ ] Cross-chain bridge
+- [ ] DAO governance
+
+---
+
+<div align="center">
+
+**Built with ❤️ on Sui Blockchain**
+
+[⬆ Back to Top](#-suiharvest)
+
+</div>
