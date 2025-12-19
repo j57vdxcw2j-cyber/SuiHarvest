@@ -1,0 +1,249 @@
+.preLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0A1929;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  overflow: hidden;
+}
+
+.preLoader.fadeOut {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.content {
+  text-align: center;
+  color: white;
+  z-index: 2;
+  position: relative;
+}
+
+.logo {
+  margin-bottom: 3rem;
+  animation: fadeInDown 1s ease;
+}
+
+.logoImage {
+  max-width: 400px;
+  width: 90vw;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 4px 20px rgba(62, 125, 255, 0.3));
+}
+
+.progressContainer {
+  margin: 3rem auto;
+  width: 400px;
+  max-width: 90vw;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.progressFill {
+  height: 100%;
+  background: #3E7DFF;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px rgba(62, 125, 255, 0.6);
+}
+
+.instruction {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  opacity: 0.9;
+  animation: pulse 2s infinite;
+}
+
+.scrollIndicator {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInUp 1s ease;
+}
+
+.mouse {
+  width: 30px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  position: relative;
+  animation: mouseMove 1.5s infinite;
+}
+
+.wheel {
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: wheelScroll 1.5s infinite;
+}
+
+.arrows {
+  display: flex;
+  flex-direction: column;
+  gap: -10px;
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.arrows span {
+  animation: arrowBounce 1.5s infinite;
+}
+
+.arrows span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.arrows span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  bottom: -50px;
+  width: 4px;
+  height: 4px;
+  background: rgba(62, 125, 255, 0.6);
+  border-radius: 50%;
+  animation: float 15s infinite linear;
+  box-shadow: 0 0 8px rgba(62, 125, 255, 0.5);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes mouseMove {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes wheelScroll {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes float {
+  from {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logoImage {
+    max-width: 280px;
+  }
+
+  .progressContainer {
+    width: 300px;
+  }
+
+  .instruction {
+    font-size: 1rem;
+  }
+}

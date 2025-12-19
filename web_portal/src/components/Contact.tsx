@@ -26,7 +26,6 @@ export function Contact() {
           <div>
 
             <h1>
-              <span role="img" aria-label="Contact" style={{ fontSize: 40, filter: 'drop-shadow(0 4px 12px rgba(59,130,246,0.5))', marginRight: 8 }}>✉️</span>
               Contact Us
             </h1>
             <p style={{ fontStyle: 'italic', fontWeight: 300 }}>
@@ -34,13 +33,13 @@ export function Contact() {
             </p>
 
             <div className={styles.contactItem}>
-              <strong>📍 HQ:</strong> Van Lang University, HCMC
+              <strong>HQ:</strong> Van Lang University, HCMC
             </div>
             <div className={styles.contactItem}>
-              <strong>📧 Email:</strong> hello@suiharvest.xyz
+              <strong>Email:</strong> hello@suiharvest.xyz
             </div>
             <div className={styles.contactItem}>
-              <strong>💬 Discord:</strong> discord.gg/suiharvest
+              <strong>Discord:</strong> discord.gg/suiharvest
             </div>
           </div>
 

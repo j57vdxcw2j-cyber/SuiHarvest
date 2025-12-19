@@ -19,3 +19,4 @@ export { CookiePolicy } from './CookiePolicy';
 export { License } from './License';
 export { Footer } from './Footer';
 export { CaseOpening } from './CaseOpening';
+export { default as PreLoader } from './PreLoader';
