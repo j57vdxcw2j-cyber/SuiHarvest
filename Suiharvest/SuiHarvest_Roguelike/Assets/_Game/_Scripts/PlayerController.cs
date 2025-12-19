@@ -1,56 +1,75 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Cài đặt chung")]
     public float moveSpeed = 5f;
 
-    [Header("Kéo Component vào đây")]
-    public Rigidbody2D rb;
-    public Animator animator; // <-- Quan trọng: Phải kéo Animator vào ô này trong Inspector
+    private Rigidbody2D rb;
+    private Animator animator;
+    private SpriteRenderer sr; // <--- 1. THÊM BIẾN NÀY
 
     private Vector2 movement;
+    private bool canMove = true;
+
+    private float lastMoveX = 0f;
+    private float lastMoveY = -1f;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>(); // <--- 2. LẤY COMPONENT RA
+    }
 
     void Update()
     {
-        // 1. Nhận nút bấm (WASD hoặc Mũi tên)
+        if (!canMove)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // 2. Xử lý Animation
-        // Kiểm tra xem nhân vật có đang di chuyển không (độ dài vector > 0)
-        if (movement.sqrMagnitude > 0)
+        // --- 3. ĐOẠN CODE LẬT MẶT (CHÈN VÀO ĐÂY) ---
+        // Nếu đi sang Phải (x > 0) -> Không lật
+        if (movement.x > 0)
         {
-            // Gửi thông số hướng đi cho Animator
-            animator.SetFloat("Horizontal", movement.x);
-            animator.SetFloat("Vertical", movement.y);
-
-            // Bật trạng thái "Đang chạy" -> Chuyển sang Blend Tree Walking
-            animator.SetBool("IsMoving", true);
-
-            // --- XỬ LÝ LẬT HÌNH (FLIP) ---
-            // Vì ông dùng chung Animation "Walk_Side" cho cả 2 bên
-            if (movement.x > 0)
-            {
-                // Đi sang Phải: Giữ nguyên
-                transform.localScale = new Vector3(1, 1, 1);
-            }
-            else if (movement.x < 0)
-            {
-                // Đi sang Trái: Lật ngược trục X lại
-                transform.localScale = new Vector3(-1, 1, 1);
-            }
+            sr.flipX = false;
         }
-        else
+        // Nếu đi sang Trái (x < 0) -> Lật ngược lại
+        else if (movement.x < 0)
         {
-            // Tắt trạng thái chạy -> Về đứng yên (Idle)
-            animator.SetBool("IsMoving", false);
+            sr.flipX = true;
+        }
+        // ---------------------------------------------
+
+        animator.SetFloat("Horizontal", movement.x);
+        animator.SetFloat("Vertical", movement.y);
+        animator.SetFloat("Speed", movement.sqrMagnitude);
+
+        if (movement != Vector2.zero)
+        {
+            lastMoveX = movement.x;
+            lastMoveY = movement.y;
+
+            animator.SetFloat("LastMoveX", lastMoveX);
+            animator.SetFloat("LastMoveY", lastMoveY);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            StartCoroutine(InteractRoutine());
         }
     }
 
-    void FixedUpdate()
+    // ... (Phần dưới giữ nguyên không đổi)
+    void FixedUpdate() { if (canMove) rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime); }
+    IEnumerator InteractRoutine()
     {
-        // 3. Di chuyển vật lý (Mượt mà và không xuyên tường)
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        // ... (Code cũ giữ nguyên) ... 
+        yield return null; // (Dòng này để chống lỗi compile nếu ông copy paste thiếu)
     }
 }

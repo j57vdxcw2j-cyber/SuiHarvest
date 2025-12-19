@@ -1,22 +1,23 @@
 ﻿using UnityEngine;
-using System.Collections.Generic; // Để dùng List
-using UnityEngine.UI; // Để chỉnh màn hình đen
+using System.Collections.Generic;
+using UnityEngine.UI;
 using System.Collections;
-using TMPro; // Để hiện số ngày
+using TMPro;
 
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager instance;
 
     [Header("UI Components")]
-    public Image blackScreenPanel; // Tấm màn đen che màn hình
-    public TextMeshProUGUI dayText; // Chữ hiện "Day 1"
+    public Image blackScreenPanel;
+    public TextMeshProUGUI dayText;
 
     [Header("Settings")]
     public int currentDay = 1;
 
-    // Danh sách chứa tất cả các cây trong map
+    // Danh sách quản lý
     private List<Crop> allCrops = new List<Crop>();
+    private List<ResourceObject> allResources = new List<ResourceObject>(); // <--- MỚI
 
     private void Awake()
     {
@@ -27,28 +28,30 @@ public class TimeManager : MonoBehaviour
     private void Start()
     {
         UpdateDayUI();
-
-        // Đảm bảo lúc đầu màn hình sáng
         if (blackScreenPanel != null)
         {
             blackScreenPanel.gameObject.SetActive(true);
             Color c = blackScreenPanel.color;
-            c.a = 0; // Trong suốt hoàn toàn
+            c.a = 0;
             blackScreenPanel.color = c;
-            blackScreenPanel.raycastTarget = false; // Để chuột bấm xuyên qua được
+            blackScreenPanel.raycastTarget = false;
         }
     }
 
-    // Hàm để cây tự đăng ký vào danh sách (được gọi từ Crop.cs)
     public void RegisterCrop(Crop crop)
     {
-        if (!allCrops.Contains(crop))
+        if (!allCrops.Contains(crop)) allCrops.Add(crop);
+    }
+
+    // --- MỚI: Hàm đăng ký Tài nguyên ---
+    public void RegisterResource(ResourceObject res)
+    {
+        if (!allResources.Contains(res))
         {
-            allCrops.Add(crop);
+            allResources.Add(res);
         }
     }
 
-    // --- HÀM NGỦ (Gọi khi bấm E vào giường/nhà) ---
     public void SleepAndNextDay()
     {
         StartCoroutine(SleepSequence());
@@ -56,25 +59,28 @@ public class TimeManager : MonoBehaviour
 
     IEnumerator SleepSequence()
     {
-        // 1. Màn hình tối dần (Fade In)
+        // 1. Tối màn hình
         yield return StartCoroutine(FadeScreen(0, 1, 1f));
 
-        // 2. Xử lý logic qua ngày
+        // 2. Qua ngày mới
         currentDay++;
         UpdateDayUI();
-        Debug.Log("Good Morning! Day " + currentDay);
 
-        // --- CÂY MỌC LẠI Ở ĐÂY ---
+        // --- XỬ LÝ CÂY TRỒNG (Lớn lên) ---
         foreach (Crop crop in allCrops)
         {
-            // Ra lệnh cho từng cây mọc lại
             crop.Regrow();
         }
 
-        // 3. Chờ 1 giây trong bóng tối
+        // --- MỚI: XỬ LÝ TÀI NGUYÊN (Mọc lại) ---
+        foreach (ResourceObject res in allResources)
+        {
+            res.RespawnResource();
+        }
+
         yield return new WaitForSeconds(1f);
 
-        // 4. Màn hình sáng dần (Fade Out)
+        // 3. Sáng màn hình
         yield return StartCoroutine(FadeScreen(1, 0, 1f));
     }
 
@@ -84,7 +90,7 @@ public class TimeManager : MonoBehaviour
 
         float timer = 0;
         Color c = blackScreenPanel.color;
-        blackScreenPanel.raycastTarget = true; // Chặn chuột khi đang chuyển cảnh
+        blackScreenPanel.raycastTarget = true;
 
         while (timer < duration)
         {
@@ -96,15 +102,11 @@ public class TimeManager : MonoBehaviour
 
         c.a = endAlpha;
         blackScreenPanel.color = c;
-
-        if (endAlpha == 0) blackScreenPanel.raycastTarget = false; // Mở lại chuột khi sáng hẳn
+        if (endAlpha == 0) blackScreenPanel.raycastTarget = false;
     }
 
     void UpdateDayUI()
     {
-        if (dayText != null)
-        {
-            dayText.text = "Day " + currentDay;
-        }
+        if (dayText != null) dayText.text = "Day " + currentDay;
     }
 }
