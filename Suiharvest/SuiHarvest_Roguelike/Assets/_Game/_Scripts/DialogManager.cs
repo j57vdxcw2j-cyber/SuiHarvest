@@ -15,7 +15,6 @@ public class DialogManager : MonoBehaviour
     public Button yesButton;
     public Button noButton;
 
-    // --- MỚI: Biến để nắm đầu 2 cái dòng chữ trong nút ---
     [Header("Button Labels")]
     public TextMeshProUGUI yesButtonText;
     public TextMeshProUGUI noButtonText;
@@ -69,7 +68,6 @@ public class DialogManager : MonoBehaviour
         noButton.gameObject.SetActive(false);
     }
 
-    // --- HÀM QUAN TRỌNG NHẤT: Thêm 2 tham số chỉnh chữ ở cuối ---
     public void ShowChoiceDialog(string name, string content, Action onYes, Action onNo, Transform speaker, string yesLabel = "Yes", string noLabel = "No")
     {
         if (dialogCoroutine != null) StopCoroutine(dialogCoroutine);
@@ -78,7 +76,6 @@ public class DialogManager : MonoBehaviour
         dialogPanel.SetActive(true);
         nameText.text = name;
 
-        // Thay đổi nội dung chữ trên nút
         if (yesButtonText != null) yesButtonText.text = yesLabel;
         if (noButtonText != null) noButtonText.text = noLabel;
 
@@ -94,7 +91,6 @@ public class DialogManager : MonoBehaviour
         noButton.onClick.AddListener(() => { onNo?.Invoke(); CloseDialog(); });
     }
 
-    // --- Phần dưới này giữ nguyên ---
     public void CloseDialog()
     {
         if (dialogCoroutine != null) StopCoroutine(dialogCoroutine);
@@ -108,12 +104,15 @@ public class DialogManager : MonoBehaviour
         notificationCoroutine = StartCoroutine(AnimateNotification(message));
     }
 
+    // --- ĐÂY LÀ CHỖ ĐÃ SỬA ---
     IEnumerator AnimateNotification(string message)
     {
         itemNotificationText.gameObject.SetActive(true);
         itemNotificationText.text = message;
         itemNotificationText.alpha = 1;
-        yield return new WaitForSeconds(15f);
+
+        yield return new WaitForSeconds(3f); // <--- Đã sửa thành 3 giây (trước là 15f)
+
         float fadeDuration = 1f;
         float timer = 0;
         while (timer < fadeDuration)
