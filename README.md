@@ -700,321 +700,342 @@ const unsubscribe = onSnapshot(
 
 ```
 sui_contracts/
-├── inventory.move    # NFT item definitions & management
-└── trader.move       # Trading, crafting, & marketplace logic
+└── game_treasury.move    # Main treasury for game economics
 ```
 
-### Inventory Module (`inventory.move`)
+**Note**: The game currently uses a simplified treasury-based economic model. NFT-based items (seeds, crops, ores, tools) and trading mechanics are planned for future releases.
 
-**Purpose**: Define and manage NFT game items
+### Game Treasury Module (`game_treasury.move`)
+
+**Purpose**: Manage all SUI flows in the game - entry fees, rewards, and admin operations
+
+**Deployed Contract**:
+```
+Package ID: 0xfa2d05a857031c41addcaee9d55b099c44ef67143d29f21cb162d54e473cc118
+Treasury ID: 0x73d75d73101f46f438a461d4b6db02a2338bb7cc75cbb8759cd7c8252fe4c881
+Admin Cap ID: 0x0ed3858755a1958fb400e8eb4c597b37952d155a80a88b77728df75c1c92fd0b
+Network: Sui Testnet
+```
 
 #### Structs
 
 ```move
-// All structs have `key` (owned objects) and `store` (transferable)
-
-public struct Seed has key, store {
+/// Main treasury object storing game funds
+public struct GameTreasury has key {
     id: UID,
-    rarity: u8,        // 1=Common, 2=Rare, 3=Epic
-    plant_type: u8,    // 1-5 different plant types
+    balance: Balance<SUI>,        // Total SUI in treasury
+    admin: address,               // Admin wallet address
+    total_deposits: u64,          // Cumulative deposits (tracking)
+    total_withdrawals: u64,       // Cumulative withdrawals (tracking)
 }
 
-public struct Crop has key, store {
+/// Admin capability token for privileged operations
+public struct AdminCap has key, store {
     id: UID,
-    rarity: u8,
-    plant_type: u8,
-    quality: u8,       // 1-3 quality tiers
-}
-
-public struct Ore has key, store {
-    id: UID,
-    ore_type: u8,      // 1=Stone, 2=Iron, 3=Gold
-}
-
-public struct Tool has key, store {
-    id: UID,
-    level: u8,         // Corresponds to ore type used
-    durability: u8,    // Max 100
-}
-```
-
-#### Functions
-
-**Minting** (package-only access):
-```move
-public(package) fun mint_seed(ctx: &mut TxContext, rarity: u8, plant_type: u8): Seed
-public(package) fun mint_crop(ctx: &mut TxContext, rarity: u8, plant_type: u8, quality: u8): Crop
-public(package) fun mint_ore(ctx: &mut TxContext, ore_type: u8): Ore
-public(package) fun mint_tool(ctx: &mut TxContext, level: u8, durability: u8): Tool
-```
-
-**Burning** (package-only access):
-```move
-public(package) fun burn_seed(seed: Seed)
-public(package) fun burn_crop(crop: Crop)
-public(package) fun burn_ore(ore: Ore)
-public(package) fun burn_tool(tool: Tool)
-```
-
-**Getters** (public read access):
-```move
-public fun seed_rarity(seed: &Seed): u8
-public fun seed_type(seed: &Seed): u8
-public fun crop_rarity(crop: &Crop): u8
-public fun ore_type(ore: &Ore): u8
-public fun tool_level(tool: &Tool): u8
-public fun tool_durability(tool: &Tool): u8
-```
-
-### Trader Module (`trader.move`)
-
-**Purpose**: Handle all economic transactions and crafting
-
-#### Shared Objects
-
-```move
-public struct HouseBank has key {
-    id: UID,
-    balance: Balance<SUI>,
-}
-
-// Created at initialization, shared with all players
-fun init(ctx: &mut TxContext) {
-    let bank = HouseBank {
-        id: object::new(ctx),
-        balance: balance::zero<SUI>(),
-    };
-    transfer::share_object(bank);
 }
 ```
 
 #### Constants
 
 ```move
-const SEED_PRICE: u64 = 100_000_000;      // 0.1 SUI
-const CRAFT_FEE: u64 = 50_000_000;        // 0.05 SUI
-const PRICE_COMMON: u64 = 50_000_000;     // 0.05 SUI
-const PRICE_RARE: u64 = 200_000_000;      // 0.2 SUI
-const PRICE_EPIC: u64 = 500_000_000;      // 0.5 SUI
+// Economic parameters
+const DAILY_ENTRY_FEE: u64 = 750_000_000;  // 0.75 SUI per day
+const MIN_REWARD: u64 = 400_000_000;       // 0.4 SUI (min chest reward)
+const MAX_REWARD: u64 = 600_000_000;       // 0.6 SUI (max chest reward)
+
+// Economics explanation:
+// - Player pays 0.75 SUI/day × ~4 days = 3.0 SUI revenue per chest
+// - Average reward: 0.5 SUI per chest
+// - Profit: 2.5 SUI per chest (83% margin) → Sustainable model
 ```
 
 #### Error Codes
 
 ```move
-const E_INSUFFICIENT_PAYMENT: u64 = 1;
-const E_WRONG_ORE_TYPE: u64 = 2;
-const E_BANK_EMPTY: u64 = 3;
-const E_UNSUPPORTED_RARITY: u64 = 4;
+const E_INSUFFICIENT_PAYMENT: u64 = 1;    // Payment below required amount
+const E_TREASURY_EMPTY: u64 = 2;          // Treasury has insufficient balance
+const E_INVALID_REWARD_AMOUNT: u64 = 3;   // Reward amount is 0 or negative
+const E_NOT_ADMIN: u64 = 4;               // Caller is not admin
+```
+
+#### Initialization
+
+```move
+fun init(ctx: &mut TxContext) {
+    let admin = tx_context::sender(ctx);
+    
+    // Create shared treasury object
+    let treasury = GameTreasury {
+        id: object::new(ctx),
+        balance: balance::zero<SUI>(),
+        admin,
+        total_deposits: 0,
+        total_withdrawals: 0,
+    };
+    
+    // Create admin capability
+    let admin_cap = AdminCap {
+        id: object::new(ctx),
+    };
+    
+    transfer::share_object(treasury);      // Make treasury accessible to all
+    transfer::transfer(admin_cap, admin);  // Give admin cap to deployer
+}
 ```
 
 ---
 
 ## ⚙️ Smart Contract Logic
 
-### 1. Buy Seed
+### 1. Pay Daily Entry Fee
 
 ```move
-public fun buy_seed(
-    bank: &mut HouseBank,
-    payment: &mut Coin<SUI>,    // Use &mut to split payment
-    clock: &Clock,               // For randomness
+public entry fun pay_daily_fee(
+    treasury: &mut GameTreasury,
+    mut payment: Coin<SUI>,
     ctx: &mut TxContext,
 )
 ```
 
+**Purpose**: Player pays 0.75 SUI to unlock gameplay for the day
+
 **Flow**:
-1. Assert payment ≥ SEED_PRICE (100 MIST)
-2. Split exact payment from user's coin
-3. Deposit to HouseBank
-4. Generate random rarity (94% common, 4% rare, 2% epic)
-5. Generate random plant type (1-5)
-6. Mint Seed NFT
-7. Transfer to user
+1. Validate payment amount ≥ DAILY_ENTRY_FEE (0.75 SUI)
+2. Split exact amount (0.75 SUI) from payment coin
+3. Convert to Balance and add to treasury
+4. Increment `total_deposits` counter
+5. Return remaining coin to player (or destroy if empty)
 
 **Key Features**:
-- Uses `coin::split()` to avoid losing excess payment
-- Pseudo-random using clock timestamp
-- NFT automatically sent to caller
+- ✅ Uses `coin::split()` to avoid losing excess payment
+- ✅ Automatically returns change to player
+- ✅ Tracks total deposits for analytics
 
-### 2. Harvest
+---
 
-```move
-public fun harvest(seed: Seed, ctx: &mut TxContext)
-```
-
-**Flow**:
-1. Read seed's rarity and plant type
-2. Burn seed NFT
-3. Determine crop quality based on seed rarity
-4. Mint Crop NFT with same rarity/type
-5. Transfer to user
-
-**Logic**:
-```move
-let quality = if (rarity == 3) { 3 }      // Epic seed → High quality
-              else if (rarity == 2) { 2 }  // Rare seed → Medium quality
-              else { 1 };                  // Common seed → Low quality
-```
-
-### 3. Sell Crop
+### 2. Claim Reward
 
 ```move
-public fun sell_crop(
-    bank: &mut HouseBank,
-    crop: Crop,
+public entry fun claim_reward(
+    treasury: &mut GameTreasury,
+    reward_amount: u64,  // In MIST (1 SUI = 1,000,000,000 MIST)
     ctx: &mut TxContext,
 )
 ```
 
+**Purpose**: Player claims accumulated rewards (e.g., from treasure chests)
+
 **Flow**:
-1. Read crop rarity
-2. Determine price (50/200/500 MIST)
-3. Assert bank has enough balance
-4. Burn crop NFT
-5. Take SUI from bank
-6. Transfer to user
+1. Validate reward_amount > 0
+2. Check treasury has sufficient balance
+3. Split reward amount from treasury balance
+4. Create coin from balance
+5. Transfer coin to player
+6. Increment `total_withdrawals` counter
 
-**Pricing Table**:
-```
-Rarity → Price
-Common → 50 MIST (0.00005 SUI)
-Rare   → 200 MIST (0.0002 SUI)
-Epic   → 500 MIST (0.0005 SUI)
-```
+**Reward Amounts**:
+- Typical range: 0.4 - 0.6 SUI per treasure chest
+- No hardcoded limits in contract (flexible for future features)
+- Backend validates reward eligibility before calling contract
 
-### 4. Craft Tool
+---
+
+### 3. Admin Deposit
 
 ```move
-public fun craft_tool(
-    bank: &mut HouseBank,
-    payment: &mut Coin<SUI>,
-    ore1: Ore,
-    ore2: Ore,
-    ore3: Ore,
+public entry fun admin_deposit(
+    treasury: &mut GameTreasury,
+    _admin_cap: &AdminCap,  // Proof of admin ownership
+    payment: Coin<SUI>,
+)
+```
+
+**Purpose**: Admin replenishes treasury to ensure sufficient funds for rewards
+
+**Flow**:
+1. Verify caller owns AdminCap (checked by Sui runtime)
+2. Convert payment coin to balance
+3. Add to treasury balance
+4. Increment `total_deposits` counter
+
+**Access Control**:
+- Requires AdminCap NFT (minted at initialization)
+- Only admin wallet can call this function
+- No amount limits (admin decision)
+
+---
+
+### 4. Admin Withdraw
+
+```move
+public entry fun admin_withdraw(
+    treasury: &mut GameTreasury,
+    admin_cap: &AdminCap,
+    amount: u64,
     ctx: &mut TxContext,
 )
 ```
 
+**Purpose**: Admin withdraws profits or performs emergency fund extraction
+
 **Flow**:
-1. Assert payment ≥ CRAFT_FEE (50 MIST)
-2. Split payment and deposit to bank
-3. Read ore types from all 3 ores
-4. Assert all ores are same type
-5. Burn all 3 ores
-6. Mint Tool with level = ore type, durability = 100
-7. Transfer to user
+1. Verify caller is the original admin (address check)
+2. Verify caller owns AdminCap
+3. Check treasury has sufficient balance
+4. Split amount from treasury
+5. Transfer to admin wallet
+6. Increment `total_withdrawals` counter
 
-**Crafting Table**:
-```
-3x Stone Ore → Stone Tool (Level 1)
-3x Iron Ore  → Iron Tool (Level 2)
-3x Gold Ore  → Gold Tool (Level 3)
-```
+**Security**:
+- ✅ Requires both AdminCap ownership AND address match
+- ✅ Prevents malicious admin transfer of AdminCap
+- ✅ Ensures only original deployer can withdraw
 
-### 5. Helper & Cheat Functions
+---
+
+### 5. View Functions
 
 ```move
-// Get price constants
-public fun price_common(): u64 { PRICE_COMMON }
-public fun price_rare(): u64 { PRICE_RARE }
-public fun price_epic(): u64 { PRICE_EPIC }
+// Get current treasury balance
+public fun get_balance(treasury: &GameTreasury): u64
 
-// Testing: Mine ore for free
-public entry fun mine_ore(clock: &Clock, ctx: &mut TxContext)
+// Get total deposits (all-time)
+public fun get_total_deposits(treasury: &GameTreasury): u64
 
-// Testing: Get epic seed for free
-public entry fun cheat_seed(ctx: &mut TxContext)
+// Get total withdrawals (all-time)
+public fun get_total_withdrawals(treasury: &GameTreasury): u64
+
+// Get admin address
+public fun get_admin(treasury: &GameTreasury): address
 ```
+
+**Purpose**: Read-only functions for analytics and monitoring
+
+---
 
 ### Transaction Examples
 
-#### Example 1: Buy and Harvest
+#### Example 1: Player Pays Entry Fee
 
-```bash
-# 1. User calls buy_seed
-sui client call \
-  --package $PACKAGE_ID \
-  --module trader \
-  --function buy_seed \
-  --args $BANK_ID $COIN_ID $CLOCK_ID \
-  --gas-budget 10000000
+```typescript
+// Frontend code (TypeScript with @mysten/sui.js)
+const tx = new Transaction();
 
-# Result: Seed NFT in user's wallet
+// Split 1 SUI from gas (contract takes 0.75, returns 0.25)
+const [paymentCoin] = tx.splitCoins(tx.gas, [1_000_000_000]);
 
-# 2. User calls harvest
-sui client call \
-  --package $PACKAGE_ID \
-  --module trader \
-  --function harvest \
-  --args $SEED_ID \
-  --gas-budget 10000000
+// Call contract
+tx.moveCall({
+  target: `${PACKAGE_ID}::game_treasury::pay_daily_fee`,
+  arguments: [
+    tx.object(GAME_TREASURY_ID),
+    paymentCoin
+  ],
+});
 
-# Result: Crop NFT in user's wallet
+await signAndExecuteTransaction({ transaction: tx });
 ```
 
-#### Example 2: Craft Tool
+#### Example 2: Player Claims Reward
+
+```typescript
+const tx = new Transaction();
+
+// Claim 0.5 SUI reward (500,000,000 MIST)
+tx.moveCall({
+  target: `${PACKAGE_ID}::game_treasury::claim_reward`,
+  arguments: [
+    tx.object(GAME_TREASURY_ID),
+    tx.pure.u64(500_000_000)
+  ],
+});
+
+await signAndExecuteTransaction({ transaction: tx });
+```
+
+#### Example 3: Admin Deposits Funds
+
+```typescript
+const tx = new Transaction();
+
+// Admin deposits 10 SUI
+const [coin] = tx.splitCoins(tx.gas, [10_000_000_000]);
+
+tx.moveCall({
+  target: `${PACKAGE_ID}::game_treasury::admin_deposit`,
+  arguments: [
+    tx.object(GAME_TREASURY_ID),
+    tx.object(ADMIN_CAP_ID),
+    coin
+  ],
+});
+
+await signAndExecuteTransaction({ transaction: tx });
+```
+
+#### Example 4: Query Treasury Balance
 
 ```bash
-# 1. User mines 3 ores (or uses cheat)
-sui client call \
-  --package $PACKAGE_ID \
-  --module trader \
-  --function mine_ore \
-  --args $CLOCK_ID \
-  --gas-budget 10000000
+# Using Sui CLI
+sui client object $GAME_TREASURY_ID --json
 
-# Repeat 3 times
-
-# 2. User crafts tool
-sui client call \
-  --package $PACKAGE_ID \
-  --module trader \
-  --function craft_tool \
-  --args $BANK_ID $COIN_ID $ORE1_ID $ORE2_ID $ORE3_ID \
-  --gas-budget 10000000
-
-# Result: Tool NFT in user's wallet
+# Look for fields.balance value in output
+# Balance is in MIST (divide by 1,000,000,000 for SUI)
 ```
+
+---
+
+### Economic Model
+
+**Revenue Flow**:
+```
+Player pays 0.75 SUI/day → Treasury
+×4 days average to reach 100 Fame Points
+= 3.0 SUI total revenue per chest
+```
+
+**Cost Flow**:
+```
+Treasury → Player: 0.4-0.6 SUI (avg 0.5 SUI)
+Profit per chest: 2.5 SUI (83% margin)
+```
+
+**Sustainability**:
+- Treasury balance grows over time
+- Admin can withdraw profits periodically
+- System remains solvent with healthy margins
+
+---
 
 ### Security Considerations
 
 #### 1. Payment Handling
-✅ **Correct**: Use `&mut Coin<SUI>` and `coin::split()`
+✅ **Proper coin splitting**:
 ```move
-let paid_coin = coin::split(payment, SEED_PRICE, ctx);
-balance::join(&mut bank.balance, coin::into_balance(paid_coin));
+let paid_coin = coin::split(&mut payment, DAILY_ENTRY_FEE, ctx);
+balance::join(&mut treasury.balance, coin::into_balance(paid_coin));
+// Remaining payment returned to sender
 ```
 
-❌ **Wrong**: Take entire coin
+#### 2. Access Control
+✅ **Admin functions protected**:
 ```move
-balance::join(&mut bank.balance, coin::into_balance(payment));
-// User loses excess payment!
+assert!(tx_context::sender(ctx) == treasury.admin, E_NOT_ADMIN);
+// Only original admin can withdraw
 ```
 
-#### 2. Validation
-✅ Always validate inputs:
+#### 3. Balance Validation
+✅ **Prevent overdraft**:
 ```move
-assert!(coin::value(payment) >= SEED_PRICE, E_INSUFFICIENT_PAYMENT);
-assert!(type1 == type2 && type2 == type3, E_WRONG_ORE_TYPE);
-assert!(balance::value(&bank.balance) >= price, E_BANK_EMPTY);
+assert!(balance::value(&treasury.balance) >= reward_amount, E_TREASURY_EMPTY);
+// Never pay more than available
 ```
 
-#### 3. Object Lifecycle
-✅ Properly burn objects when consumed:
+#### 4. Input Validation
+✅ **Validate amounts**:
 ```move
-let Seed { id, rarity: _, plant_type: _ } = seed;
-object::delete(id);
-```
-
-#### 4. Access Control
-✅ Use `public(package)` for internal functions:
-```move
-public(package) fun mint_seed(...) // Only callable by trader module
-```
-
-✅ Use `public` for user-facing functions:
-```move
-public fun buy_seed(...) // Anyone can call
+assert!(reward_amount > 0, E_INVALID_REWARD_AMOUNT);
+assert!(payment_value >= DAILY_ENTRY_FEE, E_INSUFFICIENT_PAYMENT);
 ```
 
 ---
