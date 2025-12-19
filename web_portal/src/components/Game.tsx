@@ -7,6 +7,8 @@ import { inventoryService } from '../services/inventoryService';
 import { famePointService } from '../services/famePointService';
 import { payDailyEntryFee, claimTreasureReward } from '../services/suiBlockchainService';
 import { transactionService } from '../services/transactionService';
+import { userService } from '../services/userService';
+import { TransactionType, TransactionStatus } from '../types';
 import { CaseOpening } from './CaseOpening';
 import type { GameSession, Inventory, GameState, Contract, CaseRarity } from '../types';
 import { GAME_CONSTANTS } from '../config/gameConstants';
@@ -192,8 +194,38 @@ export function Game() {
           rarity,
           txResult.digest
         );
+        
+        // Record activity for profile
+        const rarityEmoji = rarity === 'epic' ? '🌟' : rarity === 'advanced' ? '💎' : '📦';
+        await userService.recordActivity({
+          userId: walletAddress,
+          type: TransactionType.GACHA,
+          title: `Opened ${rarity} case`,
+          description: `Paid 0.75 SUI`,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Record transaction for statistics
+        await userService.recordTransaction({
+          userId: walletAddress,
+          type: TransactionType.GACHA,
+          amount: 0.75,
+          description: `Opened ${rarity} case`,
+          status: TransactionStatus.SUCCESS,
+          txHash: txResult.digest,
+          timestamp: new Date().toISOString()
+        });
       } else {
         addLog('🎁 Using free spin!');
+        
+        // Record free spin activity
+        await userService.recordActivity({
+          userId: walletAddress,
+          type: TransactionType.GACHA,
+          title: `Used free spin - ${rarity} case`,
+          description: 'Free spin granted',
+          timestamp: new Date().toISOString()
+        });
       }
       
       // Update Firestore with case opening results
@@ -332,6 +364,17 @@ export function Game() {
       if (response.success && response.data) {
         addLog(`✅ ${response.message}`);
         
+        // Record activity for profile
+        if (walletAddress) {
+          await userService.recordActivity({
+            userId: walletAddress,
+            type: TransactionType.QUEST,
+            title: `Completed ${activeSession.contract!.difficulty} contract`,
+            description: `+${response.data.suiReward.toFixed(2)} SUI`,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
         // Update session state
         setActiveSession({
           ...activeSession,
@@ -418,6 +461,26 @@ export function Game() {
           gameStats.totalSuiEarned,
           claimResult.digest
         );
+        
+        // Record activity for profile
+        await userService.recordActivity({
+          userId: walletAddress,
+          type: TransactionType.QUEST,
+          title: 'Claimed rewards',
+          description: `+${gameStats.totalSuiEarned.toFixed(2)} SUI`,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Record transaction for statistics
+        await userService.recordTransaction({
+          userId: walletAddress,
+          type: TransactionType.QUEST,
+          amount: gameStats.totalSuiEarned,
+          description: 'Claimed quest rewards',
+          status: TransactionStatus.SUCCESS,
+          txHash: claimResult.digest,
+          timestamp: new Date().toISOString()
+        });
         
         // Update Firebase to reset totalSuiEarned (already claimed)
         await gameStateService.resetClaimedSui(walletAddress);

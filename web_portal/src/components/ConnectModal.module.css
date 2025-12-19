@@ -6,11 +6,13 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 80px;
   z-index: 10000;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.2s ease;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {

@@ -17,7 +17,8 @@ import {
   CookiePolicy,
   License,
   Footer,
-  AdminDashboard
+  AdminDashboard,
+  PreLoader
 } from './components';
 import { CaseOpeningDemo } from './components/CaseOpeningDemo';
 import './styles/globals.css';
@@ -28,6 +29,8 @@ type PageType = 'home' | 'wiki' | 'game' | 'contact' | 'profile' | 'features' | 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [walletConnected, setWalletConnected] = useState(false);
+  const [showPreLoader, setShowPreLoader] = useState(true);
+  const [contentVisible, setContentVisible] = useState(false);
 
   // Handle hash navigation
   useEffect(() => {
@@ -63,8 +66,21 @@ function App() {
     setWalletConnected(false);
   };
 
+  const handlePreLoaderComplete = () => {
+    setShowPreLoader(false);
+    // Delay content appearance for smooth transition
+    setTimeout(() => {
+      setContentVisible(true);
+    }, 100);
+  };
+
+  // Show preloader every time
+  if (showPreLoader) {
+    return <PreLoader onComplete={handlePreLoaderComplete} />;
+  }
+
   return (
-    <>
+    <div className={`app-content ${contentVisible ? 'visible' : ''}`}>
       {currentPage !== 'admin' && (
         <Navigation
           currentPage={currentPage}
@@ -94,7 +110,7 @@ function App() {
       {currentPage === 'admin' && <AdminDashboard />}
 
       {currentPage !== 'demo' && currentPage !== 'admin' && <Footer />}
-    </>
+    </div>
   );
 }
 
