@@ -30,7 +30,7 @@
 
 ---
 
-## 🎮 Overview
+## Overview
 
 SuiHarvest is a decentralized farming game where players:
 - Pay a daily entry fee (0.75 SUI) to access the game
@@ -47,36 +47,36 @@ The game integrates:
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎯 Core Gameplay
+### Core Gameplay
 - **Daily Entry System**: Pay 0.75 SUI to play each day
 - **Stamina Management**: 50 stamina points for strategic gameplay
 - **Multiple Activities**:
-  - 🌱 **Farm**: Plant and harvest crops (15 stamina)
-  - 🪓 **Chop Wood**: Gather wood resources (10 stamina)
-  - ⛏️ **Mine Stone**: Extract stone materials (10 stamina)
+  - **Farm**: Plant and harvest crops (15 stamina)
+  - **Chop Wood**: Gather wood resources (10 stamina)
+  - **Mine Stone**: Extract stone materials (10 stamina)
 - **Contract System**: Complete tasks for rewards and Fame Points
 - **Inventory Management**: Collect and organize items
 - **Treasure Chests**: Unlock rewards based on Fame Points milestones
 
-### 👤 User Features
-- 🔐 **Wallet Authentication**: Connect with Sui Wallet
-- 📊 **Profile Dashboard**: Track progress and stats
-- 🎒 **Inventory System**: Manage seeds, crops, ores, and tools
-- 🏆 **Fame Points**: Earn reputation through gameplay
-- 💰 **Reward Claims**: Withdraw earnings from contracts
+### User Features
+- **Wallet Authentication**: Connect with Sui Wallet
+- **Profile Dashboard**: Track progress and stats
+- **Inventory System**: Manage seeds, crops, ores, and tools
+- **Fame Points**: Earn reputation through gameplay
+- **Reward Claims**: Withdraw earnings from contracts
 
-### 👑 Admin Dashboard
-- 🏦 **Treasury Management**: Monitor and manage game treasury
-- 👥 **Account Management**: Track users and their activity
-- 🎮 **Game Maintenance**: Control game settings and parameters
-- 📈 **Analytics**: Real-time statistics and transaction monitoring
-- 🔒 **Secure Access**: Multi-layer authentication with wallet verification
+### Admin Dashboard
+- **Treasury Management**: Monitor and manage game treasury
+- **Account Management**: Track users and their activity
+- **Game Maintenance**: Control game settings and parameters
+- **Analytics**: Real-time statistics and transaction monitoring
+- **Secure Access**: Multi-layer authentication with wallet verification
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 19.2** - UI framework
@@ -104,7 +104,7 @@ The game integrates:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 SuiHarvest/
@@ -174,7 +174,7 @@ SuiHarvest/
 
 ---
 
-## 🚀 Setup & Installation
+## Setup & Installation
 
 ### Prerequisites
 
@@ -274,16 +274,16 @@ After deployment, update `.env` with the package IDs.
 
 ---
 
-## 📐 Building Plan
+## Building Plan
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation 
 - [x] Project structure setup
 - [x] Firebase integration
 - [x] Basic UI components (Home, Wiki, Contact)
 - [x] Wallet connection system
 - [x] Authentication flow
 
-### Phase 2: Core Game ✅
+### Phase 2: Core Game 
 - [x] Game interface design
 - [x] Stamina system
 - [x] Action buttons (Farm, Chop, Mine)
@@ -292,7 +292,7 @@ After deployment, update `.env` with the package IDs.
 - [x] Fame Points tracking
 - [x] Daily entry fee integration
 
-### Phase 3: Admin Dashboard ✅
+### Phase 3: Admin Dashboard 
 - [x] Admin authentication
 - [x] Treasury management UI
 - [x] Account management system
@@ -300,21 +300,21 @@ After deployment, update `.env` with the package IDs.
 - [x] Game maintenance controls
 - [x] Real-time statistics
 
-### Phase 4: Smart Contracts ✅
+### Phase 4: Smart Contracts 
 - [x] Inventory module (NFT items)
 - [x] Trader module (buy/sell/craft)
 - [x] Treasury system
 - [x] Admin capabilities
 - [x] Test coverage
 
-### Phase 5: Integration & Polish 🔄
+### Phase 5: Integration & Polish 
 - [ ] Full blockchain integration
 - [ ] End-to-end testing
 - [ ] Performance optimization
 - [ ] Security audit
 - [ ] Production deployment
 
-### Phase 6: Future Features 📝
+### Phase 6: Future Features 
 - [ ] Multiplayer interactions
 - [ ] Guild system
 - [ ] Advanced crafting recipes
@@ -323,7 +323,7 @@ After deployment, update `.env` with the package IDs.
 
 ---
 
-## 💻 Web Implementation
+## Web Implementation
 
 ### Architecture
 
@@ -524,7 +524,7 @@ const { data, isLoading } = useQuery({
 
 ---
 
-## 🎮 Game Implementation
+## Game Implementation
 
 ### Game Loop
 
@@ -694,7 +694,7 @@ const unsubscribe = onSnapshot(
 
 ---
 
-## 🔐 Smart Contract Structure
+## Smart Contract Structure
 
 ### Module Architecture
 
@@ -807,9 +807,9 @@ public entry fun pay_daily_fee(
 5. Return remaining coin to player (or destroy if empty)
 
 **Key Features**:
-- ✅ Uses `coin::split()` to avoid losing excess payment
-- ✅ Automatically returns change to player
-- ✅ Tracks total deposits for analytics
+- Uses `coin::split()` to avoid losing excess payment
+- Automatically returns change to player
+- Tracks total deposits for analytics
 
 ---
 
@@ -887,9 +887,9 @@ public entry fun admin_withdraw(
 6. Increment `total_withdrawals` counter
 
 **Security**:
-- ✅ Requires both AdminCap ownership AND address match
-- ✅ Prevents malicious admin transfer of AdminCap
-- ✅ Ensures only original deployer can withdraw
+- Requires both AdminCap ownership AND address match
+- Prevents malicious admin transfer of AdminCap
+- Ensures only original deployer can withdraw
 
 ---
 
@@ -1010,7 +1010,7 @@ Profit per chest: 2.5 SUI (83% margin)
 ### Security Considerations
 
 #### 1. Payment Handling
-✅ **Proper coin splitting**:
+**Proper coin splitting**:
 ```move
 let paid_coin = coin::split(&mut payment, DAILY_ENTRY_FEE, ctx);
 balance::join(&mut treasury.balance, coin::into_balance(paid_coin));
@@ -1018,21 +1018,21 @@ balance::join(&mut treasury.balance, coin::into_balance(paid_coin));
 ```
 
 #### 2. Access Control
-✅ **Admin functions protected**:
+**Admin functions protected**:
 ```move
 assert!(tx_context::sender(ctx) == treasury.admin, E_NOT_ADMIN);
 // Only original admin can withdraw
 ```
 
 #### 3. Balance Validation
-✅ **Prevent overdraft**:
+**Prevent overdraft**:
 ```move
 assert!(balance::value(&treasury.balance) >= reward_amount, E_TREASURY_EMPTY);
 // Never pay more than available
 ```
 
 #### 4. Input Validation
-✅ **Validate amounts**:
+**Validate amounts**:
 ```move
 assert!(reward_amount > 0, E_INVALID_REWARD_AMOUNT);
 assert!(payment_value >= DAILY_ENTRY_FEE, E_INSUFFICIENT_PAYMENT);
@@ -1040,7 +1040,7 @@ assert!(payment_value >= DAILY_ENTRY_FEE, E_INSUFFICIENT_PAYMENT);
 
 ---
 
-## 📚 Guidelines
+## Guidelines
 
 ### For Developers
 
@@ -1142,7 +1142,7 @@ sui move test --coverage
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Frontend Deployment
 
@@ -1252,7 +1252,7 @@ sui client object <PACKAGE_ID>
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these guidelines:
 
@@ -1297,41 +1297,43 @@ chore: maintenance tasks
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 Team
+## Team
 
 **SuiHarvest Team**
-- Developer: [Your Name]
-- Designer: [Designer Name]
-- Project Lead: [Lead Name]
+- Developer 1: Nguyễn Minh Chính - 2275106050051 
+- Developer 2: Nguyễn Thành Phát - 2474802016639 
+- Developer 3: Nguyễn Hữu Đồng - 2474802010087 
+- Developer 4: Võ Việt Tiến - 2474802010391 
+- Developer 5: Hồ Du Tuấn Đạt - 2374802010097 
+- Designer 1: Hồ Du Tuấn Đạt - 2374802010097 
+- Designer 2: Nguyễn Minh Chính - 2275106050051 
+- Project Lead: Hồ Du Tuấn Đạt - 2374802010097 
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Sui Foundation** - For blockchain infrastructure
 - **Firebase** - For backend services
 - **React Team** - For the amazing framework
 - **Move Community** - For smart contract guidance
-- **Design Assets** - [Asset attribution if applicable]
+- **Van Lang University** - For cooperation and organization
 
 ---
 
-## 📞 Contact & Support
+## Contact & Support
 
 - **Website**: https://suiharvest.io (coming soon)
-- **Discord**: [Join our Discord](#)
-- **Twitter**: [@SuiHarvest](#)
-- **Email**: support@suiharvest.io
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 ### Q1 2026
 - [ ] Launch on Sui Mainnet
@@ -1352,7 +1354,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 <div align="center">
 
-**Built with ❤️ on Sui Blockchain**
+**Built with love on Sui Blockchain**
 
 [⬆ Back to Top](#-suiharvest)
 
