@@ -1,4 +1,5 @@
-# 🌾 SuiHarvest
+
+<img width="2816" height="1536" alt="SuiHarvest" src="https://github.com/user-attachments/assets/5a841fe4-6bfb-494d-a7f4-70807b1da5b0" />
 
 > A Blockchain-Powered Farming Game on Sui Network
 
