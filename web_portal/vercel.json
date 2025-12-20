@@ -6,8 +6,14 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!unity-build).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/unity-build/(.*)",
+      "dest": "/unity-build/$1"
     }
   ],
   "headers": [
