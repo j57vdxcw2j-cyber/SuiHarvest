@@ -4,6 +4,8 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
+  "cleanUrls": false,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/unity-build/Build/(.*)\\.br",
