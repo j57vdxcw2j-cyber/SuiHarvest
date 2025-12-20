@@ -73,11 +73,11 @@ export function UnityGame({ walletAddress, activeSession, onGameAction }: UnityG
     const buildUrl = '/unity-build';
     const loaderUrl = `${buildUrl}/Build/unity-build.loader.js`;
     
-    // Try Gzip first (what user currently has), then Brotli
+    // Using Brotli compression for better performance
     const config = {
-      dataUrl: `${buildUrl}/Build/unity-build.data.gz`,
-      frameworkUrl: `${buildUrl}/Build/unity-build.framework.js.gz`,
-      codeUrl: `${buildUrl}/Build/unity-build.wasm.gz`,
+      dataUrl: `${buildUrl}/Build/unity-build.data.br`,
+      frameworkUrl: `${buildUrl}/Build/unity-build.framework.js.br`,
+      codeUrl: `${buildUrl}/Build/unity-build.wasm.br`,
       streamingAssetsUrl: `${buildUrl}/StreamingAssets`,
       companyName: 'YourCompanyName',
       productName: 'SuiHarvest',
