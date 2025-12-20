@@ -12,11 +12,15 @@
   ],
   "headers": [
     {
-      "source": "/unity-build/Build/(.*)\\.gz",
+      "source": "/unity-build/Build/(.*)\\.br",
       "headers": [
         {
           "key": "Content-Encoding",
-          "value": "gzip"
+          "value": "br"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
         },
         {
           "key": "Cache-Control",
@@ -29,7 +33,24 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/unity-build/Build/(.*)\\.wasm",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
