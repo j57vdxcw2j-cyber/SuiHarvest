@@ -66,6 +66,17 @@ public class TimeManager : MonoBehaviour
         currentDay++;
         UpdateDayUI();
 
+        // Hồi đầy stamina
+        if (GameBridge.instance != null)
+        {
+            GameBridge.instance.currentStamina = GameBridge.instance.maxStamina;
+            GameBridge.NotifyStaminaChanged(GameBridge.instance.currentStamina, GameBridge.instance.maxStamina);
+            Debug.Log("[TimeManager] Stamina restored to full!");
+        }
+
+        // Thông báo lên web portal
+        GameBridge.NotifyDayStarted(currentDay);
+
         // --- XỬ LÝ CÂY TRỒNG (Lớn lên) ---
         foreach (Crop crop in allCrops)
         {

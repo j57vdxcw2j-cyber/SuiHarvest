@@ -44,6 +44,24 @@ public class ResourceObject : MonoBehaviour, IInteractable
     {
         if (currentHits >= totalHits) return;
 
+        // Kiểm tra và trừ stamina
+        int staminaCost = (resourceType == ResourceType.Tree) ? 6 : 8; // Chặt gỗ: 6, Đào đá: 8
+        
+        // Kiểm tra GameBridge stamina (không cần GameManager)
+        if (GameBridge.instance != null)
+        {
+            if (!GameBridge.instance.HasStamina(staminaCost))
+            {
+                if (DialogManager.instance != null)
+                {
+                    string actionName = (resourceType == ResourceType.Tree) ? "Chop Wood" : "Mine Ore";
+                    DialogManager.instance.ShowItemNotification($"⚠️ Not enough stamina! Need {staminaCost}");
+                }
+                return; // Không đủ stamina
+            }
+            GameBridge.instance.UseStamina(staminaCost);
+        }
+
         currentHits++;
 
         // Logic Quặng (Đổi hình)
@@ -74,6 +92,9 @@ public class ResourceObject : MonoBehaviour, IInteractable
         {
             DialogManager.instance.ShowItemNotification("+1 " + dropItemName);
         }
+
+        // Gửi thông báo lên web portal
+        GameBridge.NotifyResourceGathered(dropItemName, 1);
 
         if (resourceType == ResourceType.Ore)
         {

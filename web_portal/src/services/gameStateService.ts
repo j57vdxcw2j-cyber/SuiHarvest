@@ -739,6 +739,91 @@ class GameStateService {
       };
     }
   }
+
+  /**
+   * Update inventory: add resource to current session
+   */
+  async addResourceToInventory(
+    sessionId: string,
+    resourceType: string,
+    quantity: number
+  ): Promise<ApiResponse<GameSession>> {
+    try {
+      const sessionRef = doc(this.gameSessionsCollection, sessionId);
+      const sessionSnap = await getDoc(sessionRef);
+
+      if (!sessionSnap.exists()) {
+        return {
+          success: false,
+          error: 'Session not found'
+        };
+      }
+
+      const session = sessionSnap.data() as GameSession;
+      const updatedInventory = { ...session.inventory };
+
+      // Add resource to inventory
+      const resourceKey = resourceType.toLowerCase() as keyof Inventory;
+      if (resourceKey in updatedInventory) {
+        updatedInventory[resourceKey] = (updatedInventory[resourceKey] || 0) + quantity;
+      }
+
+      // Update Firestore
+      await updateDoc(sessionRef, {
+        inventory: updatedInventory,
+        updatedAt: new Date().toISOString()
+      });
+
+      const updatedSession: GameSession = {
+        ...session,
+        inventory: updatedInventory
+      };
+
+      return {
+        success: true,
+        data: updatedSession,
+        message: `Added ${quantity} ${resourceType} to inventory`
+      };
+    } catch (error: any) {
+      console.error('Error adding resource to inventory:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to add resource'
+      };
+    }
+  }
+
+  /**
+   * Update stamina in current session
+   */
+  async updateStamina(
+    sessionId: string,
+    currentStamina: number
+  ): Promise<ApiResponse<GameSession>> {
+    try {
+      const sessionRef = doc(this.gameSessionsCollection, sessionId);
+      
+      await updateDoc(sessionRef, {
+        currentStamina: currentStamina,
+        updatedAt: new Date().toISOString()
+      });
+
+      const sessionSnap = await getDoc(sessionRef);
+      const session = sessionSnap.data() as GameSession;
+
+      return {
+        success: true,
+        data: session,
+        message: 'Stamina updated'
+      };
+    } catch (error: any) {
+      console.error('Error updating stamina:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to update stamina'
+      };
+    }
+  }
 }
 
 export const gameStateService = new GameStateService();

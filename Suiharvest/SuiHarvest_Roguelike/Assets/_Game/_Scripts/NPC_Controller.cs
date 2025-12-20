@@ -17,7 +17,13 @@ public class NPC_Controller : MonoBehaviour, IInteractable
             DialogManager.instance.ShowChoiceDialog(
                 npcName,
                 content,
-                () => { Debug.Log("Accepted Quest!"); },
+                () => { 
+                    Debug.Log("Accepted Quest!");
+                    Debug.Log("[NPC_Controller] Calling GameBridge.NotifyTraderInteraction()...");
+                    // Thông báo lên Web Portal để mở gacha và trả 0.75 SUI
+                    GameBridge.NotifyTraderInteraction();
+                    Debug.Log("[NPC_Controller] GameBridge.NotifyTraderInteraction() called!");
+                },
                 () => { Debug.Log("Refused Quest!"); },
                 transform,
                 "What do you need?", // <--- Chữ nút trái cho Trader

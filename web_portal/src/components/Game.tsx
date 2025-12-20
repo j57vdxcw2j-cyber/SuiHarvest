@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { gameStateService } from '../services/gameStateService';
-import { resourceService } from '../services/resourceService';
 import { inventoryService } from '../services/inventoryService';
-import { famePointService } from '../services/famePointService';
 import { payDailyEntryFee, claimTreasureReward } from '../services/suiBlockchainService';
 import { transactionService } from '../services/transactionService';
 import { userService } from '../services/userService';
 import { TransactionType, TransactionStatus } from '../types';
 import { CaseOpening } from './CaseOpening';
+import { UnityGame } from './UnityGame';
 import type { GameSession, Inventory, GameState, Contract, CaseRarity } from '../types';
 import { GAME_CONSTANTS } from '../config/gameConstants';
 import styles from './Game.module.css';
@@ -19,6 +18,7 @@ export function Game() {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const [loading, setLoading] = useState(true);
   const [activeSession, setActiveSession] = useState<GameSession | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null); // Store sessionId separately
   const [gameStats, setGameStats] = useState<GameState | null>(null);
   const [actionLog, setActionLog] = useState<string[]>([]);
   const [showCaseOpening, setShowCaseOpening] = useState(false);
@@ -70,6 +70,7 @@ export function Game() {
         const sessionResponse = await gameStateService.getCurrentSession(walletAddress);
         if (sessionResponse.success && sessionResponse.data) {
           setActiveSession(sessionResponse.data);
+          setSessionId(sessionResponse.data.id); // Store sessionId separately
         }
 
         // Get game stats
@@ -134,7 +135,7 @@ export function Game() {
   };
 
   const handleOpenCase = () => {
-    if (!activeSession || !activeSession.id) {
+    if (!activeSession || !sessionId) {
       addLog('❌ No active session');
       return;
     }
@@ -164,7 +165,7 @@ export function Game() {
   };
 
   const handleCaseComplete = async (contract: Contract, rarity: CaseRarity, grantedFreeSpin: boolean) => {
-    if (!walletAddress || !activeSession || !activeSession.id) {
+    if (!walletAddress || !activeSession || !sessionId) {
       addLog('❌ Invalid session');
       setShowCaseOpening(false);
       return;
@@ -196,7 +197,6 @@ export function Game() {
         );
         
         // Record activity for profile
-        const rarityEmoji = rarity === 'epic' ? '🌟' : rarity === 'advanced' ? '💎' : '📦';
         await userService.recordActivity({
           userId: walletAddress,
           type: TransactionType.GACHA,
@@ -231,7 +231,7 @@ export function Game() {
       // Update Firestore with case opening results
       const response = await gameStateService.updateSessionAfterCaseOpening(
         walletAddress,
-        activeSession.id,
+        sessionId,
         contract,
         rarity,
         grantedFreeSpin
@@ -279,76 +279,122 @@ export function Game() {
     }
   };
 
-  const handleAction = async (actionType: 'water_crop' | 'chop_tree' | 'mine_stone', cropType?: string) => {
-    if (!activeSession) {
-      addLog('❌ No active session. Start a new day first!');
-      return;
-    }
-
-    try {
-      // Get stamina cost
-      const staminaCost = resourceService.getStaminaCost(actionType);
-      
-      if (activeSession.currentStamina < staminaCost) {
-        addLog(`❌ Not enough stamina! Need ${staminaCost}, have ${activeSession.currentStamina}`);
-        return;
-      }
-
-      addLog(`⚡ Using ${staminaCost} stamina...`);
-
-      // Perform resource action
-      const actionResponse = resourceService.performAction(actionType, { cropType: cropType as any });
-      
-      if (!actionResponse.success || !actionResponse.data) {
-        addLog(`❌ Action failed: ${actionResponse.error}`);
-        return;
-      }
-
-      const { itemType, quantity, staminaCost: cost } = actionResponse.data;
-
-      // Create action record
-      const action = {
-        id: `action_${Date.now()}`,
-        type: actionType,
-        location: actionType === 'water_crop' ? 'farm' : actionType === 'chop_tree' ? 'forest' : 'mountain',
-        staminaCost: cost,
-        result: {
-          itemType,
-          quantity,
-          success: true
-        },
-        timestamp: new Date().toISOString()
-      } as any;
-
-      // Use stamina
-      const staminaResponse = await gameStateService.useStamina(activeSession.id, cost, action);
-      
-      if (!staminaResponse.success) {
-        addLog(`❌ Failed to use stamina: ${staminaResponse.error}`);
-        return;
-      }
-
-      // Update inventory
-      const newInventory = inventoryService.addItem(activeSession.inventory, itemType as any, quantity);
-      await gameStateService.updateSessionInventory(activeSession.id, newInventory);
-
-      // Update local state
-      setActiveSession({
-        ...activeSession,
-        currentStamina: staminaResponse.data!.currentStamina,
-        inventory: newInventory,
-        actions: [...activeSession.actions, action]
-      });
-
-      addLog(`✅ ${actionResponse.message}`);
-    } catch (error: any) {
-      console.error('Error performing action:', error);
-      addLog(`❌ Error: ${error.message}`);
+  // Unity game action handler - handles events from Unity game
+  const handleUnityGameAction = (action: string, data: any) => {
+    console.log('Unity action received:', action, data);
+    
+    // Handle different Unity actions
+    switch (action) {
+      case 'resource_gathered':
+        const { resourceType, quantity } = data;
+        addLog(`📦 +${quantity} ${resourceType}`);
+        
+        // Debug log
+        console.log('[resource_gathered] sessionId:', sessionId);
+        console.log('[resource_gathered] resourceType:', resourceType, 'quantity:', quantity);
+        
+        // Save to Firestore immediately
+        if (sessionId && walletAddress) {
+          console.log('[resource_gathered] Calling addResourceToInventory...');
+          gameStateService.addResourceToInventory(
+            sessionId,
+            resourceType,
+            quantity
+          ).then((response) => {
+            console.log('[resource_gathered] API response:', response);
+            
+            if (response.success && response.data) {
+              console.log('[resource_gathered] Updated inventory:', response.data.inventory);
+              setActiveSession(response.data);
+              
+              // Check quest progress
+              if (response.data.contract && response.data.contract.requirements) {
+                const contract = response.data.contract;
+                const requirements = contract.requirements;
+                const inventory = response.data.inventory;
+                
+                console.log('[quest_check] Requirements:', requirements);
+                console.log('[quest_check] Inventory:', inventory);
+                
+                // Find which resource is required
+                const requiredResources = Object.entries(requirements).filter(([_, amount]) => amount && amount > 0);
+                
+                if (requiredResources.length > 0) {
+                  requiredResources.forEach(([resource, required]) => {
+                    const currentAmount = inventory[resource as keyof typeof inventory] || 0;
+                    
+                    console.log(`[quest_check] ${resource}: ${currentAmount}/${required}`);
+                    
+                    if (currentAmount >= required!) {
+                      addLog(`✅ Quest complete! ${currentAmount}/${required} ${resource}`);
+                    } else {
+                      addLog(`📊 Quest progress: ${currentAmount}/${required} ${resource}`);
+                    }
+                  });
+                }
+              }
+            } else {
+              console.error('[resource_gathered] Failed to save resource:', response.error);
+              addLog(`❌ Failed to save: ${response.error}`);
+            }
+          }).catch(error => {
+            console.error('[resource_gathered] Exception:', error);
+            addLog(`❌ Error: ${error.message}`);
+          });
+        } else {
+          console.error('[resource_gathered] Missing sessionId or walletAddress!');
+          addLog('❌ No active session - resource not saved');
+        }
+        break;
+        
+      case 'stamina_changed':
+        addLog(`⚡ Stamina: ${data.current}/${data.max}`);
+        
+        // Update local state immediately for responsiveness
+        if (activeSession) {
+          setActiveSession(prev => prev ? {
+            ...prev,
+            currentStamina: data.current,
+            maxStamina: data.max
+          } : null);
+        }
+        
+        // Save stamina to Firestore in background (don't await)
+        if (sessionId) {
+          gameStateService.updateStamina(sessionId, data.current).catch(error => {
+            console.error('[stamina_changed] Failed to save:', error);
+          });
+        }
+        break;
+        
+      case 'day_started':
+        addLog(`🌅 Day ${data.day} started! Stamina restored!`);
+        
+        // Refresh session after new day
+        if (walletAddress) {
+          gameStateService.getCurrentSession(walletAddress).then((response) => {
+            if (response.success && response.data) {
+              setActiveSession(response.data);
+            }
+          });
+        }
+        break;
+        
+      case 'trader_interaction':
+        // Người chơi click "What do you need?" → Hiển thị popup xác nhận mở rương
+        addLog('💬 Trader: "Let me show you today\'s quests..."');
+        setShowOpenCaseConfirm(true);
+        break;
+        
+      default:
+        break;
     }
   };
 
+
+
   const handleSubmitContract = async () => {
-    if (!activeSession) {
+    if (!activeSession || !sessionId) {
       addLog('❌ No active session');
       return;
     }
@@ -357,7 +403,7 @@ export function Game() {
       addLog('📦 Submitting contract...');
       
       const response = await gameStateService.submitContract(
-        activeSession.id,
+        sessionId,
         signAndExecuteTransaction
       );
       
@@ -392,39 +438,6 @@ export function Game() {
       }
     } catch (error: any) {
       console.error('Error submitting contract:', error);
-      addLog(`❌ Error: ${error.message}`);
-    }
-  };
-
-  const handleEndDay = async () => {
-    if (!activeSession) {
-      addLog('❌ No active session');
-      return;
-    }
-
-    if (!window.confirm('🌙 Kết thúc ngày? Một số items sẽ bị mất ngẫu nhiên (30-50% mỗi loại)!')) {
-      return;
-    }
-
-    try {
-      addLog('🌙 Ending day...');
-      
-      const response = await gameStateService.endDay(activeSession.id);
-      
-      if (response.success) {
-        addLog(`✅ ${response.message}`);
-        setActiveSession(null);
-        
-        // Refresh stats
-        const statsResponse = await gameStateService.getGameStats(walletAddress!);
-        if (statsResponse.success) {
-          setGameStats(statsResponse.data!);
-        }
-      } else {
-        addLog(`❌ ${response.error}`);
-      }
-    } catch (error: any) {
-      console.error('Error ending day:', error);
       addLog(`❌ Error: ${error.message}`);
     }
   };
@@ -534,7 +547,7 @@ export function Game() {
     return (
       <div className={styles.gameContainer}>
         <div className={styles.noWallet}>
-          <h2>🎮 Game Simulator</h2>
+          <h2>🎮 SuiHarvest Game</h2>
           <p>Please connect your wallet to play</p>
         </div>
       </div>
@@ -746,24 +759,9 @@ export function Game() {
           )}
         </div>
 
-        {/* Center Panel - Game Actions */}
+        {/* Center Panel - Unity Game */}
         <div className={styles.centerPanel}>
-          <div className={styles.staminaCard}>
-            <h3>⚡ Stamina</h3>
-            <div className={styles.staminaBar}>
-              <div
-                className={styles.staminaFill}
-                style={{
-                  width: `${activeSession ? (activeSession.currentStamina / activeSession.maxStamina) * 100 : 0}%`
-                }}
-              ></div>
-            </div>
-            <div className={styles.staminaText}>
-              {activeSession ? `${activeSession.currentStamina} / ${activeSession.maxStamina}` : '0 / 50'}
-            </div>
-          </div>
-
-          {!activeSession && gameStats?.canStartNewDay && (
+          {!activeSession && gameStats?.canStartNewDay ? (
             <div className={styles.startDayCard}>
               <h2>🌅 Bắt đầu ngày mới</h2>
               <p style={{ color: '#10b981', fontWeight: 600 }}>✨ Miễn phí - Hồi đầy stamina</p>
@@ -775,42 +773,28 @@ export function Game() {
                 {isProcessingBlockchain ? '⏳ Đang xử lý...' : 'Bắt đầu ngày mới'}
               </button>
             </div>
-          )}
-
-          {activeSession && activeSession.contract && (
+          ) : (
             <>
-              <div className={styles.actionsGrid}>
-                <div className={styles.actionCard}>
-                  <h4>🌱 Farm</h4>
-                  <p>Cost: 2 Stamina</p>
-                  <div className={styles.cropButtons}>
-                    <button onClick={() => handleAction('water_crop', 'carrot')}>🥕 Carrot</button>
-                    <button onClick={() => handleAction('water_crop', 'potato')}>🥔 Potato</button>
-                    <button onClick={() => handleAction('water_crop', 'wheat')}>🌾 Wheat</button>
-                  </div>
+              <div className={styles.staminaCard}>
+                <h3>⚡ Stamina</h3>
+                <div className={styles.staminaBar}>
+                  <div
+                    className={styles.staminaFill}
+                    style={{
+                      width: `${activeSession ? (activeSession.currentStamina / activeSession.maxStamina) * 100 : 0}%`
+                    }}
+                  ></div>
                 </div>
-
-                <div className={styles.actionCard}>
-                  <h4>🌲 Forest</h4>
-                  <p>Cost: 6 Stamina</p>
-                  <button onClick={() => handleAction('chop_tree')}>🪓 Chop Wood</button>
-                </div>
-
-                <div className={styles.actionCard}>
-                  <h4>⛰️ Mountain</h4>
-                  <p>Cost: 8 Stamina</p>
-                  <button onClick={() => handleAction('mine_stone')}>⛏️ Mine Stone</button>
-                  <small style={{ fontSize: '11px', color: '#888' }}>
-                    Stone 70% | Coal 20% | Iron 10%
-                  </small>
+                <div className={styles.staminaText}>
+                  {activeSession ? `${activeSession.currentStamina} / ${activeSession.maxStamina}` : '0 / 50'}
                 </div>
               </div>
 
-              <div className={styles.endDayCard}>
-                <button className={styles.endButton} onClick={handleEndDay}>
-                  🌙 Sleep (End Day & Burn Items)
-                </button>
-              </div>
+              <UnityGame
+                walletAddress={walletAddress!}
+                activeSession={activeSession}
+                onGameAction={handleUnityGameAction}
+              />
             </>
           )}
         </div>

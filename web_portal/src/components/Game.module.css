@@ -34,10 +34,11 @@
 /* Layout */
 .gameLayout {
   display: grid;
-  grid-template-columns: 300px 1fr 300px;
+  grid-template-columns: 350px 1fr 350px;
   gap: 20px;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
+  height: calc(100vh - 140px);
 }
 
 /* Panel Styles */
@@ -45,6 +46,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
+}
+
+.centerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
 }
 
 /* Card Base Styles */
@@ -180,6 +189,24 @@
 }
 
 /* Stamina Card */
+.staminaCard {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px 16px 0 0;
+  padding: 16px 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.staminaCard h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .staminaBar {
   width: 100%;
   height: 24px;
@@ -207,12 +234,22 @@
 /* Start Day Card */
 .startDayCard {
   text-align: center;
-  padding: 40px 20px;
+  padding: 80px 40px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .startDayCard h2 {
   color: white;
-  font-size: 32px;
+  font-size: 36px;
   margin-bottom: 16px;
 }
 
@@ -238,83 +275,6 @@
 .startButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
-}
-
-/* Actions Grid */
-.actionsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.actionCard {
-  text-align: center;
-  padding: 16px;
-}
-
-.actionCard h4 {
-  color: white;
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.actionCard p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.actionCard button {
-  width: 100%;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 8px;
-}
-
-.actionCard button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.actionCard button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.cropButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* End Day Card */
-.endDayCard {
-  text-align: center;
-  padding: 16px;
-}
-
-.endButton {
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.endButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
 }
 
 /* Inventory Card */
@@ -375,13 +335,25 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .gameLayout {
+    grid-template-columns: 300px 1fr 300px;
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 1200px) {
   .gameLayout {
     grid-template-columns: 1fr;
+    height: auto;
   }
   
-  .actionsGrid {
-    grid-template-columns: 1fr;
+  .leftPanel, .rightPanel {
+    overflow-y: visible;
+  }
+  
+  .centerPanel {
+    min-height: 600px;
   }
 }
 
